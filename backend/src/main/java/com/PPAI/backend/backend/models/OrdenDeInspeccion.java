@@ -19,6 +19,11 @@ public class OrdenDeInspeccion {
 
 
     // metodos de la solucion
+
+    public void Cerrar(Estado estado){
+        this.estado = estado;
+    }
+
     public OrdenDeInspeccionDTO obtenerDatos() {
         Sismografo sis = estacionSismologica.buscarSismografo();
         OrdenDeInspeccionDTO datos = new OrdenDeInspeccionDTO(this.numeroOrden, this.fechaHoraFinalizacion,

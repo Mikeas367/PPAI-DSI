@@ -2,9 +2,9 @@ package com.PPAI.backend.backend.controllers;
 
 import com.PPAI.backend.backend.DTOs.OrdenDeInspeccionDTO;
 import com.PPAI.backend.backend.models.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,11 +17,48 @@ public class GestorOrdenInspeccion {
     private  List<OrdenDeInspeccion> ordenesDeInspeccion = new ArrayList<>(); // estas serian las que estan en la base de datos
     private Sesion sesion;
     private Empleado empleadoLogueado; // este es el empleado que busco de la sesion
-    private  List<OrdenDeInspeccionDTO> inspeccionesCompletamenteFinalizadas = new ArrayList<>(); // son las que encuentro con el empleado
+    private  List<OrdenDeInspeccion> ordenesDeInspeccionFinalizadas = new ArrayList<>();
+    List<MotivoTipo> motivoTipos = new ArrayList<>();
+    List<Estado> estados = new ArrayList<>();
+
+    @PutMapping("/ordenes/{nroOrden}/estado")
+    public ResponseEntity actualizarEstado(@PathVariable int nroOrden, @RequestBody Estado estado) {
+        System.out.println("ME LLEGO EL PING" + nroOrden);
+        System.out.println(ordenesDeInspeccion);
+
+        for (OrdenDeInspeccion orden : ordenesDeInspeccion) {
+            System.out.println("Esta es la orden" + orden.getNumeroOrden());
+            if(orden.getNumeroOrden() == nroOrden){
+                orden.setEstado(estado);
+                System.out.println("EL ESTADO SE CAMBIO A: " + orden.getEstado().getNombreEstado());
+                return ResponseEntity.ok("Estado actualizado con éxito");
+            }
+
+        }
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Orden no encontrada");
+    }
+
 
     @GetMapping("/finalizadas")
-    public List<OrdenDeInspeccionDTO> obtenerFinalizadasPorEmpleado() {
-        return inspeccionesCompletamenteFinalizadas;
+    public List<OrdenDeInspeccionDTO> buscarInspeccionesCompletamenteFinalizadas() {
+        List<OrdenDeInspeccionDTO> dtos = new ArrayList<>();
+        for (OrdenDeInspeccion orden : ordenesDeInspeccion) {
+            if(orden.sosDeEmpleado(empleadoLogueado) && orden.esCompletamenteRealizada()){
+                OrdenDeInspeccionDTO dto = orden.obtenerDatos();
+                dtos.add(dto);
+            }
+        }
+        return dtos;
+    }
+
+    @GetMapping("/todas")
+    public List<OrdenDeInspeccion> obtenerTodas() {
+        return ordenesDeInspeccion;
+    }
+
+    @GetMapping("/motivos-tipo")
+    public List<MotivoTipo> obtenerMotivoTipos() {
+        return motivoTipos;
     }
 
     public Empleado buscarEmpleadoLogueado(){
@@ -29,21 +66,32 @@ public class GestorOrdenInspeccion {
         return sesion.getUsuario().getEmpleado();
     }
 
-
-
-
-    public void buscarInspeccionesCompletamenteFinalizadas(){
-        System.out.println("aca entro wacho");
-
-        for (OrdenDeInspeccion orden: ordenesDeInspeccion) {
-            System.out.println("si no leo esto soy gey");
-            System.out.println(orden.getNumeroOrden());
-            if (orden.sosDeEmpleado(empleadoLogueado) && orden.esCompletamenteRealizada()){
-                OrdenDeInspeccionDTO ordenDTO = orden.obtenerDatos();
-                inspeccionesCompletamenteFinalizadas.add(ordenDTO);
-            }
+    public void buscarTiposParaFueraDeServicio() {
+        for (MotivoTipo motivoTipo : motivoTipos) {
+            System.out.println(motivoTipo.getDescripcion());
         }
     }
+
+    public Estado buscarEstadoCerrado() {
+        for (Estado estado : estados) {
+            if (estado.esDeAmbitoOrdenDeInspeccion() && estado.esCerrada()){
+                return estado;
+            }
+        }
+        return null;
+    }
+
+
+
+    //public void buscarInspeccionesCompletamenteFinalizadas(){
+    //    System.out.println("aca entro wacho");
+    //
+    //    for (OrdenDeInspeccion orden: ordenesDeInspeccion) {
+    //        if (orden.sosDeEmpleado(empleadoLogueado) && orden.esCompletamenteRealizada()){
+    //            ordenesDeInspeccionFinalizadas.add(orden);
+    //        }
+    //    }
+    //}
 
 
     // constructor
@@ -53,6 +101,16 @@ public class GestorOrdenInspeccion {
         // ademas no se si se modelan las nuevas clases que necesita el framework
 
         // voy a crear un DTO para enviarles los datos al front papu
+
+        MotivoTipo motivoTipo = new MotivoTipo("se rompio la punta del sismografo");
+        MotivoTipo motivoTipo2 = new MotivoTipo("Se quedo sin hojas");
+        MotivoTipo motivoTipo3 = new MotivoTipo("ya dejo de sismosear");
+        MotivoTipo motivoTipo4 = new MotivoTipo("me quede sin ideas");
+
+        motivoTipos.add(motivoTipo);
+        motivoTipos.add(motivoTipo2);
+        motivoTipos.add(motivoTipo3);
+        motivoTipos.add(motivoTipo4);
 
         LocalDate fechaEspecifica1 = LocalDate.of(2026, 1, 1);
 
@@ -97,19 +155,23 @@ public class GestorOrdenInspeccion {
         estacionSismologica6.setSismografos(sismografos);
 
         // creacion empleados
-        Empleado empleado1 = new Empleado("Lopez", "dieguito10@gmail.com", "Diego", "123");
-        Empleado empleado2 = new Empleado("Gariglio", "juanceto01@gmail.com", "Juan", "133");
-        Empleado empleado3 = new Empleado("Estevez", "kris12@gmail.com", "Miguel", "923");
+        Empleado empleado1 = new Empleado("Lopez", "dieguito10@gmail.com", "Diego", "1010");
+        Empleado empleado2 = new Empleado("Gariglio", "juanceto01@gmail.com", "Juan", "1333");
+        Empleado empleado3 = new Empleado("Estevez", "kris12@gmail.com", "Miguel", "9243");
 
 
         // creacion estados
 
-        Estado estadoCompletamenteRealizada = new Estado();
-        estadoCompletamenteRealizada.setNombreEstado("Completamente Realizada");
+        Estado estadoCompletamenteRealizada = new Estado("Ambito Orden", "Completamente Realizada");
+        Estado estadoPendienteDeRealizacion = new Estado("Ambito Orden","Pendiente De Realizacion");
+        Estado estadoCerrada = new Estado("Ambito Orden","Cerrada");
 
+        estados.add(estadoCompletamenteRealizada);
+        estados.add(estadoPendienteDeRealizacion);
+        estados.add(estadoCerrada);
 
-        Estado estadoPendienteDeRealizacion = new Estado();
-        estadoPendienteDeRealizacion.setNombreEstado("Pendiente De Realizacion");
+        //  cerrada
+
 
         OrdenDeInspeccion ordenDeInspeccion = new OrdenDeInspeccion(null, fechaEspecifica1, null, 123, "caca");
         ordenDeInspeccion.setEmpleado(empleado1);
@@ -163,7 +225,8 @@ public class GestorOrdenInspeccion {
 
         buscarEmpleadoLogueado();
         buscarInspeccionesCompletamenteFinalizadas();
-        inspeccionesCompletamenteFinalizadas.sort(Comparator.comparing(OrdenDeInspeccionDTO::getFechaHoraFinalizacion));
+        ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaHoraFinalizacion));
+        buscarTiposParaFueraDeServicio();
 
         //inspeccionesCompletamenteFinalizadas
     }

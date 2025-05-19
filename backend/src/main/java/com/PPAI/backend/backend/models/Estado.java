@@ -15,6 +15,22 @@ public class Estado {
         return false;
     }
 
+    public boolean esCerrada(){
+        if (this.nombreEstado == "Cerrada"){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean esDeAmbitoOrdenDeInspeccion(){
+        if (this.ambito == "Ambito Orden"){
+            return true;
+        }
+        return false;
+    }
+
+
+
 
     // contrusctores
     public Estado() {
