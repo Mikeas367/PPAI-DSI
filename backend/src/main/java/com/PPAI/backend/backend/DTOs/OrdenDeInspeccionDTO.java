@@ -1,7 +1,6 @@
-package com.PPAI.backend.backend;
+package com.PPAI.backend.backend.DTOs;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 // los datos que necesitaria seria -> numeroDeOrden
 // -> fechaHoraFinalizacion
@@ -11,11 +10,21 @@ public class OrdenDeInspeccionDTO {
     private int numeroOrden;
     private LocalDate  fechaHoraFinalizacion;
     private String nombreEstacionSismologica;
+    private  int identificadorSismografo;
 
-    public OrdenDeInspeccionDTO(int numeroOrden, LocalDate  fechaHoraFinalizacion, String nombreEstacionSismologica) {
+    public OrdenDeInspeccionDTO(int numeroOrden, LocalDate  fechaHoraFinalizacion, String nombreEstacionSismologica , int identificadorSismografo) {
         this.numeroOrden = numeroOrden;
         this.fechaHoraFinalizacion = fechaHoraFinalizacion;
         this.nombreEstacionSismologica = nombreEstacionSismologica;
+        this.identificadorSismografo = identificadorSismografo;
+    }
+
+    public int getIdentificadorSismografo() {
+        return identificadorSismografo;
+    }
+
+    public void setIdentificadorSismografo(int identificadorSismografo) {
+        this.identificadorSismografo = identificadorSismografo;
     }
 
     public int getNumeroOrden() {

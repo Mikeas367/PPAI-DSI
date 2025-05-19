@@ -1,6 +1,7 @@
 package com.PPAI.backend.backend.models;
 
 import java.util.Date;
+import java.util.List;
 
 public class EstacionSismologica {
     private int codigoEstacion;
@@ -11,7 +12,24 @@ public class EstacionSismologica {
     private String nombre;
     private int nroCertificacionAdquisicion;
 
+    List<Sismografo> sismografos; //estos sismografos
+    // SON TEMPORALES SOLO LO USO PARA RECORRER PARA ENCONTRAR EL SIS QUE LE PERTENECE A ESTA ES
+
+    public void setSismografos(List<Sismografo> sismografos) {
+        this.sismografos = sismografos;
+    }
+
     // metodos de solucion
+
+
+    public Sismografo buscarSismografo(){
+        for(Sismografo sismografo : sismografos){
+            if (sismografo.sosDeEstacionSismologica(this)){
+                return sismografo;
+            }
+        }
+        return null;
+    }
 
     // constructores
 

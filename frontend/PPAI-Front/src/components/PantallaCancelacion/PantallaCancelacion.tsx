@@ -23,6 +23,7 @@ export const PantallaCierreDeOrdenDeInspeccion = () => {
                 <th>Numero De Orden</th>
                 <th>fechaHoraCierre</th>
                 <th>Estacion Sismologica</th>
+                <th>Identificador de Sismografo</th>
               </tr>
             </thead>
             <tbody>
@@ -32,6 +33,7 @@ export const PantallaCierreDeOrdenDeInspeccion = () => {
                     <td>{o.numeroOrden}</td>
                     <td>{o.fechaHoraFinalizacion}</td>
                     <td>{o.nombreEstacionSismologica}</td>
+                    <td>{o.identificadorSismografo}</td>
                   </tr>
                 );
               })}

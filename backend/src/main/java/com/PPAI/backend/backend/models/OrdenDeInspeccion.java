@@ -1,9 +1,9 @@
 package com.PPAI.backend.backend.models;
 
-import com.PPAI.backend.backend.OrdenDeInspeccionDTO;
+import com.PPAI.backend.backend.DTOs.OrdenDeInspeccionDTO;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.List;
 
 public class OrdenDeInspeccion {
     private LocalDate  fechaHoraCierre;
@@ -20,12 +20,13 @@ public class OrdenDeInspeccion {
 
     // metodos de la solucion
     public OrdenDeInspeccionDTO obtenerDatos() {
-        OrdenDeInspeccionDTO datos = new OrdenDeInspeccionDTO(this.numeroOrden, this.fechaHoraFinalizacion, this.estacionSismologica.getNombre());
+        Sismografo sis = estacionSismologica.buscarSismografo();
+        OrdenDeInspeccionDTO datos = new OrdenDeInspeccionDTO(this.numeroOrden, this.fechaHoraFinalizacion,
+                this.estacionSismologica.getNombre(), sis.getIdentificadorSismografo());
         return datos;
     }
 
     public boolean sosDeEmpleado(Empleado empleado) {
-        // podemos comparar por nombre o por objeto que combiene?????
         if(this.empleado.equals(empleado)) {
             return true;
         }
@@ -61,11 +62,11 @@ public class OrdenDeInspeccion {
         this.fechaHoraCierre = fechaHoraCierre;
     }
 
-    public LocalDate  getFechaHoraFinalizacion() {
+    public LocalDate getFechaHoraFinalizacion() {
         return fechaHoraFinalizacion;
     }
 
-    public void setFechaHoraFinalizacion(LocalDate  fechaHoraFinalizacion) {
+    public void setFechaHoraFinalizacion(LocalDate fechaHoraFinalizacion) {
         this.fechaHoraFinalizacion = fechaHoraFinalizacion;
     }
 
