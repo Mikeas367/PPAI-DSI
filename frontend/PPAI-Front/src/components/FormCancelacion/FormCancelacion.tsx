@@ -1,33 +1,87 @@
-import { useEffect, useState } from "react"
-import type { MotivoTipo } from "../../models/MotivoTipo"
-import { getMotivosTipo } from "../../services/motivosTipo.service"
-
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getMotivosTipo } from "../../services/motivosTipo.service";
+import type { MotivoTipo } from "../../models/MotivoTipo";
+import { actualizarEstadoOrden } from "../../services";
+// Asumiendo que tiene { id: number, nombre: string }
 
 export const FormCancelacion = () => {
-    const [motivos, setMotivos] = useState<MotivoTipo[]>()
+  const { numeroOrden } = useParams();
+  const navigate = useNavigate();
 
-    useEffect(()=>{
-        const obtenenerMotivos = async() => {
-            const response = await getMotivosTipo()
-            setMotivos(response.data)
-        }
-        obtenenerMotivos()
-    })
+  const [motivos, setMotivos] = useState<MotivoTipo[]>([]);
+  const [seleccionados, setSeleccionados] = useState<number[]>([]);
+  const [comentarios, setComentarios] = useState<{ [id: number]: string }>({});
+
+  useEffect(() => {
+    const obtenerMotivos = async () => {
+      const response = await getMotivosTipo();
+      console.log(response.data)
+      setMotivos(response.data);
+    };
+    obtenerMotivos();
+  }, []);
+
+  const toggleSeleccion = (id: number) => {
+    if (seleccionados.includes(id)) {
+      setSeleccionados(seleccionados.filter(m => m !== id));
+      const nuevosComentarios = { ...comentarios };
+      delete nuevosComentarios[id];
+      setComentarios(nuevosComentarios);
+    } else {
+      setSeleccionados([...seleccionados, id]);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload = seleccionados.map(id => ({
+    idMotivoTipo: id,
+    comentario: comentarios[id] || ""
+  }));
 
 
+    console.log("Datos a enviar:", payload);
 
-    return(
-        <>
-        <label>Seleccione El motivo Tipo: </label>
-        <select>
-            {
-                motivos?.map((m, index) => (
-                    <option key={index} value={m.descripcion}>
-                        {m.descripcion}
-                    </option>
-                ))
-            }
-        </select>
-        </>
-    )    
-}
+    // Acá iría tu POST al backend, por ejemplo:
+    await actualizarEstadoOrden(Number(numeroOrden), payload)
+    // await enviarCancelacionOrden(payload);
+
+    alert("Cancelación enviada");
+    navigate("/");
+  };
+
+  return (
+    <div>
+      <h2>Cancelar Orden #{numeroOrden}</h2>
+      <form onSubmit={handleSubmit}>
+        {motivos.map((m) => (
+          <div key={m.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={seleccionados.includes(m.id)}
+                onChange={() => toggleSeleccion(m.id)}
+              />
+              {m.descripcion}
+            </label>
+            {seleccionados.includes(m.id) && (
+              <div>
+                <input
+                  type="text"
+                  placeholder={`Comentario para ${m.descripcion}`}
+                  value={comentarios[m.id] || ""}
+                  onChange={(e) =>
+                    setComentarios({ ...comentarios, [m.id]: e.target.value })
+                  }
+                />
+              </div>
+            )}
+          </div>
+        ))}
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  );
+};

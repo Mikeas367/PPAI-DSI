@@ -2,7 +2,7 @@ import axios from "axios"
 
 import { apiRoutes } from "../config";
 import type { OrdenDeInspeccion } from "../models";
-import type { Estado } from "../models/Estado";
+import type { MotivoTipo } from "../models/MotivoTipo";
 
 const ordenesURL = apiRoutes.OrdenesCompletamenteFinalizadas;
 
@@ -11,8 +11,7 @@ export const obtenerOrdenes = async () => {
     return response
 }
 
-export const actualizarEstadoOrden = async (numeroOrden: number, estado: Estado) => {
-    const url = `http://localhost:8080/api/ordenes/${numeroOrden}/estado`
-    const response = await axios.put(url, estado)
+export const actualizarEstadoOrden = async (numeroOrden: number, motivos: { idMotivoTipo: number; comentario: string }[]) => {
+    const response = await axios.put(ordenesURL+`/cambiar-estado-orden/${numeroOrden}`, motivos)
     return response
 }

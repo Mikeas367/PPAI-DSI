@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import type { OrdenDeInspeccion } from "../../models";
 import { obtenerOrdenes } from "../../services";
-import type { Estado } from "../../models/Estado"
 import { actualizarEstadoOrden } from "../../services"
+import { useNavigate } from "react-router-dom";
 
 // este seria el "MostrarOrdenes" -> si le ponemos ese nombre no le hace justicia a lo que es el componente una lista basicamente
 export const PantallaCierreDeOrdenDeInspeccion = () => {
@@ -19,16 +19,18 @@ export const PantallaCierreDeOrdenDeInspeccion = () => {
         opcionCerrarOrdenInspeccion()
     },[])
 
-     const estado: Estado = {
-        ambito:"Ambito Orden", nombreEstado:"Cerrada"
-    }
+ 
+    //const cerrarOrden = async(numeroOrden: number) => {
+    //    await actualizarEstadoOrden(numeroOrden)
+    //    const response = await obtenerOrdenes();
+    //    console.log("ordenes despues de actulizar: ", ordenes)
+    //    setOrdenes(response.data);
+    //    alert("EstadoACTUALIZADO")
+    //}
 
-    const cerrarOrden = async(numeroOrden: number) => {
-        await actualizarEstadoOrden(numeroOrden, estado)
-        const response = await obtenerOrdenes();
-        console.log("ordenes despues de actulizar: ", ordenes)
-        setOrdenes(response.data);
-        alert("EstadoACTUALIZADO")
+    const navigate = useNavigate()
+    const cerrar = (numeroOrden: number) => {
+      navigate(`/cancelar/${numeroOrden}`)
     }
 
     return(
@@ -53,7 +55,7 @@ export const PantallaCierreDeOrdenDeInspeccion = () => {
                     <td>{o.nombreEstacionSismologica}</td>
                     <td>{o.identificadorSismografo}</td>
                     <td>{
-                        <button onClick={() => cerrarOrden(o.numeroOrden)}>Cerrar</button>
+                        <button onClick={() => cerrar(o.numeroOrden)}>Cerrar</button>
                       }
                     </td>
                   </tr>

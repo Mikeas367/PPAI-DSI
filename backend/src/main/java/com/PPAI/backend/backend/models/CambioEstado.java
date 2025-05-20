@@ -1,14 +1,24 @@
 package com.PPAI.backend.backend.models;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class CambioEstado {
     private LocalDate fechaHoraFin;
     private LocalDate fechaHoraInicio;
 
     private Estado estado;
+    private List<MotivoFueraServicio> motivoFueraServicio;
 
-    public boolean esEstadoActual(){
+    public List<MotivoFueraServicio> getMotivoFueraServicio() {
+        return motivoFueraServicio;
+    }
+
+    public void setMotivoFueraServicio(List<MotivoFueraServicio> motivoFueraServicio) {
+        this.motivoFueraServicio = motivoFueraServicio;
+    }
+
+    public boolean esActual(){
         if(fechaHoraFin == null) {
             return true;
         }

@@ -29,6 +29,20 @@ public class Estado {
         return false;
     }
 
+    public boolean esDeAmbitoSismografo(){
+        if (this.ambito == "Ambito Sismografo"){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean esFueraDeServicio(){
+        if (this.nombreEstado == "Fuera De Servicio"){
+            return true;
+        }
+        return false;
+    }
+
 
 
 

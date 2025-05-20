@@ -9,7 +9,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Menu/>}></Route>
           <Route path="/cierre-de-inspeccion" element={<PantallaCierreDeOrdenDeInspeccion/>}></Route>
-          <Route path="/form-cancelacion" element={<FormCancelacion/>}></Route>
+          <Route path="cancelar/:numeroOrden" element={<FormCancelacion/>}></Route>
         </Routes>
       </Router>
     </>

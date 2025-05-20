@@ -13,7 +13,26 @@ public class Sismografo {
     private List<CambioEstado> cambioEstados;
 
 
+    public void ponerEnFueraServicio(Estado estado, List<MotivoFueraServicio> motivoFueraServicios){;
+        //System.out.println("Poniendo en fura de servicio");
+        //System.out.println("Estado: " + estadoActual.getNombreEstado());
+        setEstadoActual(estado);
+        //System.out.println("Se cambio a: " + estadoActual.getNombreEstado());
+        CambioEstado ce = buscarEstadoActual();
+        ce.setFechaHoraFin(LocalDate.now());
+        ce.setEstado(estado);
+        ce.setMotivoFueraServicio(motivoFueraServicios);
 
+    }
+
+    public CambioEstado buscarEstadoActual(){
+        for (CambioEstado cambioEstado : cambioEstados) {
+            if (cambioEstado.esActual()){
+                return cambioEstado;
+            }
+        }
+        return null;
+    }
 
     public boolean sosDeEstacionSismologica(EstacionSismologica estacionSismologica) {
         if(this.estacionSismologica.equals(estacionSismologica)){

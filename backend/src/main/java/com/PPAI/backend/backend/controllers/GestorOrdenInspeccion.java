@@ -1,5 +1,6 @@
 package com.PPAI.backend.backend.controllers;
 
+import com.PPAI.backend.backend.DTOs.MotivoFueraServicioDTO;
 import com.PPAI.backend.backend.DTOs.OrdenDeInspeccionDTO;
 import com.PPAI.backend.backend.models.*;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -20,16 +22,50 @@ public class GestorOrdenInspeccion {
     private  List<OrdenDeInspeccion> ordenesDeInspeccionFinalizadas = new ArrayList<>();
     List<MotivoTipo> motivoTipos = new ArrayList<>();
     List<Estado> estados = new ArrayList<>();
+    List<CambioEstado> cambioEstadosSismografro= new ArrayList<>();
+    List<Sismografo> sismografos = new ArrayList<>();
+    private Sismografo sismografoSeleccionado;
 
-    @PutMapping("/ordenes/{nroOrden}/estado")
-    public ResponseEntity actualizarEstado(@PathVariable int nroOrden, @RequestBody Estado estado) {
-        System.out.println("ME LLEGO EL PING" + nroOrden);
-        System.out.println(ordenesDeInspeccion);
+
+    public MotivoTipo buscarMotivoTipoPorId(int id) {
+        for (MotivoTipo motivoTipo : motivoTipos) {
+            if (motivoTipo.getId() == id) {
+                return motivoTipo;
+            }
+        }
+        return null;
+    }
+
+    @PutMapping("/finalizadas/cambiar-estado-orden/{nroOrden}")
+    public ResponseEntity actualizarEstado(@PathVariable int nroOrden, @RequestBody List<MotivoFueraServicioDTO> motivos) {
+        // Aca
+        List<MotivoTipo> motivoTiposSelecc = new ArrayList<>();
+        List<MotivoFueraServicio> motivoFueraServicios = new ArrayList<>();
+
+        for (MotivoFueraServicioDTO motivo : motivos) {
+
+            MotivoTipo motivoTipoSelecc = buscarMotivoTipoPorId(motivo.getIdMotivoTipo());
+            motivoTiposSelecc.add(motivoTipoSelecc);
+
+            MotivoFueraServicio motivoFueraServicioSelecc = new MotivoFueraServicio(motivo.getDescripcion(), motivoTipoSelecc);
+            motivoFueraServicios.add(motivoFueraServicioSelecc);
+
+        }
+
+        Estado fueraServicio = buscarEstadoFueraDeServicio();
+        //System.out.println("Fuera de servicio: " + fueraServicio.getNombreEstado());
+        sismografoSeleccionado.ponerEnFueraServicio(fueraServicio, motivoFueraServicios);
+
+        //System.out.println("ME LLEGO EL PING" + nroOrden);
+        //System.out.println(ordenesDeInspeccion);
 
         for (OrdenDeInspeccion orden : ordenesDeInspeccion) {
             System.out.println("Esta es la orden" + orden.getNumeroOrden());
             if(orden.getNumeroOrden() == nroOrden){
-                orden.setEstado(estado);
+                Estado estadoCerrado = buscarEstadoCerrado(); // busco el estado
+                orden.setEstado(estadoCerrado); // seteo el estado
+                LocalDate fechaHoraActual = LocalDate.now(); // saco la fecha actual
+                orden.setFechaHoraCierre(fechaHoraActual); // seteo la fechahoracierre
                 System.out.println("EL ESTADO SE CAMBIO A: " + orden.getEstado().getNombreEstado());
                 return ResponseEntity.ok("Estado actualizado con éxito");
             }
@@ -38,13 +74,22 @@ public class GestorOrdenInspeccion {
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Orden no encontrada");
     }
 
+    public void buscarSismografroPorId(int id){
+        for (Sismografo sismografo : sismografos){
+            if (sismografo.getIdentificadorSismografo() == id){
+                this.sismografoSeleccionado = sismografo;
+            }
+        }
+    }
 
     @GetMapping("/finalizadas")
     public List<OrdenDeInspeccionDTO> buscarInspeccionesCompletamenteFinalizadas() {
         List<OrdenDeInspeccionDTO> dtos = new ArrayList<>();
+
         for (OrdenDeInspeccion orden : ordenesDeInspeccion) {
             if(orden.sosDeEmpleado(empleadoLogueado) && orden.esCompletamenteRealizada()){
                 OrdenDeInspeccionDTO dto = orden.obtenerDatos();
+                buscarSismografroPorId(dto.getIdentificadorSismografo());
                 dtos.add(dto);
             }
         }
@@ -53,11 +98,16 @@ public class GestorOrdenInspeccion {
 
     @GetMapping("/todas")
     public List<OrdenDeInspeccion> obtenerTodas() {
+        System.out.println("asi queda el Cambio Estado sismografro: " + sismografoSeleccionado.buscarEstadoActual().getEstado().getNombreEstado());
+        System.out.println("asi queda el Estado sismografo" + sismografoSeleccionado.getEstadoActual().getNombreEstado());
         return ordenesDeInspeccion;
     }
 
     @GetMapping("/motivos-tipo")
     public List<MotivoTipo> obtenerMotivoTipos() {
+        for (MotivoTipo motivoTipo : motivoTipos) {
+            System.out.println(motivoTipo.getId());
+        }
         return motivoTipos;
     }
 
@@ -75,6 +125,16 @@ public class GestorOrdenInspeccion {
     public Estado buscarEstadoCerrado() {
         for (Estado estado : estados) {
             if (estado.esDeAmbitoOrdenDeInspeccion() && estado.esCerrada()){
+                System.out.println("se encontro el estado: " + estado.getNombreEstado());
+                return estado;
+            }
+        }
+        return null;
+    }
+
+    public Estado buscarEstadoFueraDeServicio() {
+        for (Estado estado : estados) {
+            if (estado.esDeAmbitoSismografo() && estado.esFueraDeServicio()){
                 return estado;
             }
         }
@@ -102,25 +162,25 @@ public class GestorOrdenInspeccion {
 
         // voy a crear un DTO para enviarles los datos al front papu
 
-        MotivoTipo motivoTipo = new MotivoTipo("se rompio la punta del sismografo");
-        MotivoTipo motivoTipo2 = new MotivoTipo("Se quedo sin hojas");
-        MotivoTipo motivoTipo3 = new MotivoTipo("ya dejo de sismosear");
-        MotivoTipo motivoTipo4 = new MotivoTipo("me quede sin ideas");
+        MotivoTipo motivoTipo = new MotivoTipo(1,"se rompio la punta del sismografo");
+        MotivoTipo motivoTipo2 = new MotivoTipo(2,"Se quedo sin hojas");
+        MotivoTipo motivoTipo3 = new MotivoTipo(3,"ya dejo de sismosear");
+        MotivoTipo motivoTipo4 = new MotivoTipo(4,"me quede sin ideas");
 
         motivoTipos.add(motivoTipo);
         motivoTipos.add(motivoTipo2);
         motivoTipos.add(motivoTipo3);
         motivoTipos.add(motivoTipo4);
 
-        LocalDate fechaEspecifica1 = LocalDate.of(2026, 1, 1);
+        LocalDate fechaEspecifica1 = LocalDate.of(1900, 1, 1);
 
-        LocalDate fechaEspecifica2 = LocalDate.of(2025, 12, 1);
+        LocalDate fechaEspecifica2 = LocalDate.of(4000, 12, 1);
 
-        LocalDate fechaEspecifica3 = LocalDate.of(2025, 6, 1);
+        LocalDate fechaEspecifica3 = LocalDate.of(2024, 6, 1);
 
-        LocalDate fechaEspecifica4 = LocalDate.of(2025, 9, 13);
+        LocalDate fechaEspecifica4 = LocalDate.of(2023, 9, 13);
 
-        LocalDate fechaEspecifica5 = LocalDate.of(2025, 9, 25);
+        LocalDate fechaEspecifica5 = LocalDate.of(2022, 9, 25);
 
         LocalDate fechaEspecifica6 = LocalDate.of(1999, 9, 6);
 
@@ -139,7 +199,8 @@ public class GestorOrdenInspeccion {
         Sismografo sismografo5 = new Sismografo(fechaEspecifica5, 555, "PH08W98", estacionSismologica5, null, null);
         Sismografo sismografo6 = new Sismografo(fechaEspecifica6, 666, "PH03X98", estacionSismologica6, null, null);
 
-        List<Sismografo> sismografos = new ArrayList<>();
+
+
         sismografos.add(sismografo1);
         sismografos.add(sismografo2);
         sismografos.add(sismografo3);
@@ -166,9 +227,7 @@ public class GestorOrdenInspeccion {
         Estado estadoPendienteDeRealizacion = new Estado("Ambito Orden","Pendiente De Realizacion");
         Estado estadoCerrada = new Estado("Ambito Orden","Cerrada");
 
-        estados.add(estadoCompletamenteRealizada);
-        estados.add(estadoPendienteDeRealizacion);
-        estados.add(estadoCerrada);
+
 
         //  cerrada
 
@@ -224,9 +283,30 @@ public class GestorOrdenInspeccion {
         // (me olvide q se lo habia puesto asi y estuve renegando como mono porque no sabia q re poronga era q me enviava un array vacio)
 
         buscarEmpleadoLogueado();
-        buscarInspeccionesCompletamenteFinalizadas();
+        buscarInspeccionesCompletamenteFinalizadas(); // ojo con sacar esta linea porque esta ejecuta el metodo que busca el sismografo xd -> hay que ver como podemos hacer para obtener el sismografo si utilizar este metodo
         ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaHoraFinalizacion));
         buscarTiposParaFueraDeServicio();
+
+        Estado estadoFueraServicio = new Estado("Ambito Sismografo", "Fuera De Servicio");
+        Estado estadoEnLinea = new Estado("Ambito Sismografo", "En Linea");
+        Estado estadoFueraDeLinea = new Estado("Ambito Sismografo", "Fuera De Linea");
+
+        sismografoSeleccionado.setEstadoActual(estadoFueraDeLinea);
+        System.out.println("aaa: " + sismografoSeleccionado.getEstadoActual().getNombreEstado());
+        CambioEstado  cambioEstado1 = new CambioEstado(fechaEspecifica1, estadoEnLinea);
+        cambioEstado1.setFechaHoraFin(LocalDate.now());
+
+        CambioEstado cambioEstado2 = new CambioEstado(fechaEspecifica2, estadoFueraDeLinea);
+        cambioEstadosSismografro.add(cambioEstado1);
+        cambioEstadosSismografro.add(cambioEstado2);// este tiene fecha fin null
+        cambioEstado2.setFechaHoraFin(null);
+        sismografoSeleccionado.setCambioEstados(cambioEstadosSismografro);
+
+        estados.add(estadoCompletamenteRealizada);
+        estados.add(estadoPendienteDeRealizacion);
+        estados.add(estadoCerrada);
+        estados.add(estadoFueraServicio);
+        estados.add(estadoEnLinea);
 
         //inspeccionesCompletamenteFinalizadas
     }
