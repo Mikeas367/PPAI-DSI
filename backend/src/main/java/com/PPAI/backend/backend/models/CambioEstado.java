@@ -8,14 +8,20 @@ public class CambioEstado {
     private LocalDate fechaHoraInicio;
 
     private Estado estado;
-    private List<MotivoFueraServicio> motivoFueraServicio;
+    private List<MotivoFueraServicio> motivosFueraServicio;
 
-    public List<MotivoFueraServicio> getMotivoFueraServicio() {
-        return motivoFueraServicio;
+    public void MostrarMotivos(){
+        for (MotivoFueraServicio m : motivosFueraServicio){
+            System.out.println("Esto es la motivo" + m.getComentario());
+        }
     }
 
-    public void setMotivoFueraServicio(List<MotivoFueraServicio> motivoFueraServicio) {
-        this.motivoFueraServicio = motivoFueraServicio;
+    public List<MotivoFueraServicio> getMotivoFueraServicio() {
+        return motivosFueraServicio;
+    }
+
+    public void setMotivosFueraServicio(List<MotivoFueraServicio> motivosFueraServicio) {
+        this.motivosFueraServicio = motivosFueraServicio;
     }
 
     public boolean esActual(){

@@ -12,16 +12,28 @@ public class Sismografo {
     private Estado estadoActual;
     private List<CambioEstado> cambioEstados;
 
+    public void crearCambioEstado(LocalDate fechaHoraInicio, List<MotivoFueraServicio> motivoFueraServicio, Estado estado) {
+        System.out.println("------------>creando cambio estado");
+        CambioEstado cambioEstado = new CambioEstado(fechaHoraInicio, estado);
+        cambioEstado.setMotivosFueraServicio(motivoFueraServicio);
+        System.out.println("------------>aca abajo va el mostrar motivos del CE Nuevo");
+        cambioEstado.MostrarMotivos();
+        cambioEstado.setFechaHoraFin(null);
+        cambioEstados.add(cambioEstado);
+    }
 
-    public void ponerEnFueraServicio(Estado estado, List<MotivoFueraServicio> motivoFueraServicios){;
-        //System.out.println("Poniendo en fura de servicio");
-        //System.out.println("Estado: " + estadoActual.getNombreEstado());
+    public void ponerEnFueraServicio(Estado estado, List<MotivoFueraServicio> motivoFueraServicios, LocalDate fechaHoraActual) {
+        for (MotivoFueraServicio m : motivoFueraServicios){
+            System.out.println("Esto son los Motivos que me llegan al sismografo para crear el CE: " + m.getComentario());
+        }
+        System.out.println("Poniendo en fura de servicio");
         setEstadoActual(estado);
-        //System.out.println("Se cambio a: " + estadoActual.getNombreEstado());
+        System.out.println("Se cambio a: " + estadoActual.getNombreEstado());
         CambioEstado ce = buscarEstadoActual();
-        ce.setFechaHoraFin(LocalDate.now());
-        ce.setEstado(estado);
-        ce.setMotivoFueraServicio(motivoFueraServicios);
+        ce.setFechaHoraFin(fechaHoraActual);
+        System.out.println("el ce que se encuentra es : " + ce.getEstado().getNombreEstado());
+        // falta crear el cambio de estado
+        crearCambioEstado(fechaHoraActual, motivoFueraServicios, estado);
 
     }
 

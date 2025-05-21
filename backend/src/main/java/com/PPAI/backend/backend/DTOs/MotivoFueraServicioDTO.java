@@ -1,15 +1,15 @@
 package com.PPAI.backend.backend.DTOs;
 
 public class MotivoFueraServicioDTO {
-    private String descripcion;
+    private String comentario;
     private int idMotivoTipo;
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getComentario() {
+        return comentario;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setComentario(String comentario) {
+        this.comentario = comentario;
     }
 
     public int getIdMotivoTipo() {

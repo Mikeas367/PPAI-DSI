@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -26,6 +25,9 @@ public class GestorOrdenInspeccion {
     List<Sismografo> sismografos = new ArrayList<>();
     private Sismografo sismografoSeleccionado;
 
+    public LocalDate obtenerFechaHoraActual(){
+        return LocalDate.now();
+    }
 
     public MotivoTipo buscarMotivoTipoPorId(int id) {
         for (MotivoTipo motivoTipo : motivoTipos) {
@@ -43,34 +45,42 @@ public class GestorOrdenInspeccion {
         List<MotivoFueraServicio> motivoFueraServicios = new ArrayList<>();
 
         for (MotivoFueraServicioDTO motivo : motivos) {
+            System.out.println("esta es la descripcion que me manda el front: " + motivo.getComentario());
 
-            MotivoTipo motivoTipoSelecc = buscarMotivoTipoPorId(motivo.getIdMotivoTipo());
+            MotivoTipo motivoTipoSelecc = buscarMotivoTipoPorId(motivo.getIdMotivoTipo()); // motivo Tipo que viene del front
+            System.out.println("este es el motivo tipo que me manda el front: " + motivoTipoSelecc.getDescripcion());
             motivoTiposSelecc.add(motivoTipoSelecc);
 
-            MotivoFueraServicio motivoFueraServicioSelecc = new MotivoFueraServicio(motivo.getDescripcion(), motivoTipoSelecc);
-            motivoFueraServicios.add(motivoFueraServicioSelecc);
+            MotivoFueraServicio motivoFueraServicioSelecc = new MotivoFueraServicio(); // voy a crear cada uno de los motivosFueraServicio
+            motivoFueraServicioSelecc.setMotivoTipo(motivoTipoSelecc);
+            motivoFueraServicioSelecc.setComentario(motivo.getComentario());
 
+            motivoFueraServicios.add(motivoFueraServicioSelecc); // lo añado a la lista
+
+            System.out.println("este es el motivo que creo yo con la descripcion del front: " + motivoFueraServicioSelecc.getComentario());
         }
-
-        Estado fueraServicio = buscarEstadoFueraDeServicio();
-        //System.out.println("Fuera de servicio: " + fueraServicio.getNombreEstado());
-        sismografoSeleccionado.ponerEnFueraServicio(fueraServicio, motivoFueraServicios);
 
         //System.out.println("ME LLEGO EL PING" + nroOrden);
         //System.out.println(ordenesDeInspeccion);
+        LocalDate fechaHoraActual = LocalDate.now();
+
+        Estado fueraServicio = buscarEstadoFueraDeServicio();
+        //System.out.println("Fuera de servicio: " + fueraServicio.getNombreEstado());
+
+        sismografoSeleccionado.ponerEnFueraServicio(fueraServicio, motivoFueraServicios, fechaHoraActual);
 
         for (OrdenDeInspeccion orden : ordenesDeInspeccion) {
             System.out.println("Esta es la orden" + orden.getNumeroOrden());
             if(orden.getNumeroOrden() == nroOrden){
                 Estado estadoCerrado = buscarEstadoCerrado(); // busco el estado
                 orden.setEstado(estadoCerrado); // seteo el estado
-                LocalDate fechaHoraActual = LocalDate.now(); // saco la fecha actual
                 orden.setFechaHoraCierre(fechaHoraActual); // seteo la fechahoracierre
                 System.out.println("EL ESTADO SE CAMBIO A: " + orden.getEstado().getNombreEstado());
                 return ResponseEntity.ok("Estado actualizado con éxito");
             }
 
         }
+
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Orden no encontrada");
     }
 
@@ -100,7 +110,14 @@ public class GestorOrdenInspeccion {
     public List<OrdenDeInspeccion> obtenerTodas() {
         System.out.println("asi queda el Cambio Estado sismografro: " + sismografoSeleccionado.buscarEstadoActual().getEstado().getNombreEstado());
         System.out.println("asi queda el Estado sismografo" + sismografoSeleccionado.getEstadoActual().getNombreEstado());
+        CambioEstado cambioEstadoActual = sismografoSeleccionado.buscarEstadoActual();
+        cambioEstadoActual.MostrarMotivos();
         return ordenesDeInspeccion;
+    }
+
+    @GetMapping("/sismografo")
+    public Sismografo obtenerSismografro() {
+        return sismografoSeleccionado;
     }
 
     @GetMapping("/motivos-tipo")
@@ -307,6 +324,10 @@ public class GestorOrdenInspeccion {
         estados.add(estadoCerrada);
         estados.add(estadoFueraServicio);
         estados.add(estadoEnLinea);
+
+        System.out.println("asi esta el Cambio Estado sismografro: " + sismografoSeleccionado.buscarEstadoActual().getEstado().getNombreEstado());
+        System.out.println("asi esta el Estado sismografo" + sismografoSeleccionado.getEstadoActual().getNombreEstado());
+
 
         //inspeccionesCompletamenteFinalizadas
     }
