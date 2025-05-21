@@ -99,7 +99,7 @@ public class GestorOrdenInspeccion {
         for (OrdenDeInspeccion orden : ordenesDeInspeccion) {
             if(orden.sosDeEmpleado(empleadoLogueado) && orden.esCompletamenteRealizada()){
                 OrdenDeInspeccionDTO dto = orden.obtenerDatos();
-                //buscarSismografroPorId(dto.getIdentificadorSismografo());
+                buscarSismografroPorId(dto.getIdentificadorSismografo());
                 dtos.add(dto);
             }
         }
@@ -296,7 +296,7 @@ public class GestorOrdenInspeccion {
         Usuario usuario3 = new Usuario("DiegoyoloARG", "1299", empleado3);
         Sesion sesion3 = new Sesion(usuario3);
 
-        this.sesion = sesion1; // aca podemos elegir la sesion, LA SESION 1 NO TIENE ORDENES COMPLETADAS
+        this.sesion = sesion3; // aca podemos elegir la sesion, LA SESION 1 NO TIENE ORDENES COMPLETADAS
         // (me olvide q se lo habia puesto asi y estuve renegando como mono porque no sabia q re poronga era q me enviava un array vacio)
 
         buscarEmpleadoLogueado();
@@ -308,16 +308,16 @@ public class GestorOrdenInspeccion {
         Estado estadoEnLinea = new Estado("Ambito Sismografo", "En Linea");
         Estado estadoFueraDeLinea = new Estado("Ambito Sismografo", "Fuera De Linea");
 
-        //sismografoSeleccionado.setEstadoActual(estadoFueraDeLinea);
-        //System.out.println("aaa: " + sismografoSeleccionado.getEstadoActual().getNombreEstado());
-        //CambioEstado  cambioEstado1 = new CambioEstado(fechaEspecifica1, estadoEnLinea);
-        //cambioEstado1.setFechaHoraFin(LocalDate.now());
+        sismografoSeleccionado.setEstadoActual(estadoFueraDeLinea);
+        System.out.println("aaa: " + sismografoSeleccionado.getEstadoActual().getNombreEstado());
+        CambioEstado  cambioEstado1 = new CambioEstado(fechaEspecifica1, estadoEnLinea);
+        cambioEstado1.setFechaHoraFin(LocalDate.now());
 
-        //CambioEstado cambioEstado2 = new CambioEstado(fechaEspecifica2, estadoFueraDeLinea);
-        //cambioEstadosSismografro.add(cambioEstado1);
-        //cambioEstadosSismografro.add(cambioEstado2);// este tiene fecha fin null
-        //cambioEstado2.setFechaHoraFin(null);
-        //sismografoSeleccionado.setCambioEstados(cambioEstadosSismografro);
+        CambioEstado cambioEstado2 = new CambioEstado(fechaEspecifica2, estadoFueraDeLinea);
+        cambioEstadosSismografro.add(cambioEstado1);
+        cambioEstadosSismografro.add(cambioEstado2);// este tiene fecha fin null
+        cambioEstado2.setFechaHoraFin(null);
+        sismografoSeleccionado.setCambioEstados(cambioEstadosSismografro);
 
         estados.add(estadoCompletamenteRealizada);
         estados.add(estadoPendienteDeRealizacion);
@@ -325,8 +325,8 @@ public class GestorOrdenInspeccion {
         estados.add(estadoFueraServicio);
         estados.add(estadoEnLinea);
 
-        //System.out.println("asi esta el Cambio Estado sismografro: " + sismografoSeleccionado.buscarEstadoActual().getEstado().getNombreEstado());
-        //System.out.println("asi esta el Estado sismografo" + sismografoSeleccionado.getEstadoActual().getNombreEstado());
+        System.out.println("asi esta el Cambio Estado sismografro: " + sismografoSeleccionado.buscarEstadoActual().getEstado().getNombreEstado());
+        System.out.println("asi esta el Estado sismografo" + sismografoSeleccionado.getEstadoActual().getNombreEstado());
 
 
         //inspeccionesCompletamenteFinalizadas
