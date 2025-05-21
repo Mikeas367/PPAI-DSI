@@ -53,35 +53,45 @@ export const FormCancelacion = () => {
   };
 
   return (
-    <div>
-      <h2>Cancelar Orden #{numeroOrden}</h2>
-      <form onSubmit={handleSubmit}>
-        {motivos.map((m) => (
-          <div key={m.id}>
-            <label>
-              <input
-                type="checkbox"
-                checked={seleccionados.includes(m.id)}
-                onChange={() => toggleSeleccion(m.id)}
-              />
-              {m.descripcion}
-            </label>
-            {seleccionados.includes(m.id) && (
-              <div>
-                <input
-                  type="text"
-                  placeholder={`Comentario para ${m.descripcion}`}
-                  value={comentarios[m.id] || ""}
-                  onChange={(e) =>
-                    setComentarios({ ...comentarios, [m.id]: e.target.value })
-                  }
-                />
-              </div>
-            )}
+    <div className="container mt-4">
+  <h2 className="mb-4">Cancelar Orden #{numeroOrden}</h2>
+  <form onSubmit={handleSubmit}>
+    {motivos.map((m) => (
+      <div className="mb-3" key={m.id}>
+        <div className="form-check">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id={`motivo-${m.id}`}
+            checked={seleccionados.includes(m.id)}
+            onChange={() => toggleSeleccion(m.id)}
+          />
+          <label className="form-check-label" htmlFor={`motivo-${m.id}`}>
+            {m.descripcion}
+          </label>
+        </div>
+        {seleccionados.includes(m.id) && (
+          <div className="mt-2">
+            <input
+              type="text"
+              className="form-control"
+              placeholder={`Comentario para ${m.descripcion}`}
+              value={comentarios[m.id] || ""}
+              onChange={(e) =>
+                setComentarios({ ...comentarios, [m.id]: e.target.value })
+              }
+            />
           </div>
-        ))}
-        <button type="submit">Enviar</button>
-      </form>
-    </div>
+        )}
+      </div>
+    ))}
+    <button type="submit" className="btn btn-danger mt-3">
+      Enviar
+    </button>
+  </form>
+  <button type="submit" className="btn mt-3" onClick={()=>navigate("/cierre-de-inspeccion")}>
+      Cancelar
+  </button>
+</div>
   );
 };
