@@ -23,6 +23,8 @@ public class EstacionSismologica {
 
 
     public Sismografo buscarSismografo(){
+        // en vez de tener una lista lo mejor seria tener un BD y llamar al repo directamente aca para
+        // obtener todos los simografos, pero como no tenemos db voy a crear una lista
         for(Sismografo sismografo : sismografos){
             if (sismografo.sosDeEstacionSismologica(this)){
                 return sismografo;

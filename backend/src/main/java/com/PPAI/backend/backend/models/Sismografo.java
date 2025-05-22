@@ -12,17 +12,15 @@ public class Sismografo {
     private Estado estadoActual;
     private List<CambioEstado> cambioEstados;
 
-    public void crearCambioEstado(LocalDate fechaHoraInicio, List<MotivoFueraServicio> motivoFueraServicio, Estado estado) {
+    public void crearCambioEstado(LocalDate fechaHoraInicio, List<MotivoFueraServicio> motivoFueraServicio, Estado estado, Empleado responsable) {
         System.out.println("------------>creando cambio estado en el Sismografo");
-        CambioEstado cambioEstado = new CambioEstado(fechaHoraInicio, estado);
+        CambioEstado cambioEstado = new CambioEstado(fechaHoraInicio, estado, responsable);
         cambioEstado.setMotivosFueraServicio(motivoFueraServicio);
-        System.out.println("------------>aca abajo va el mostrar motivos del CE del sismografo Nuevo");
-        cambioEstado.MostrarMotivos();
         cambioEstado.setFechaHoraFin(null);
         cambioEstados.add(cambioEstado);
     }
 
-    public void ponerEnFueraServicio(Estado estado, List<MotivoFueraServicio> motivoFueraServicios, LocalDate fechaHoraActual) {
+    public void ponerEnFueraServicio(Estado estado, List<MotivoFueraServicio> motivoFueraServicios, LocalDate fechaHoraActual, Empleado responsable) {
         for (MotivoFueraServicio m : motivoFueraServicios){
             System.out.println("Esto son los Motivos que me llegan al sismografo para crear el CE: " + m.getComentario());
         }
@@ -31,9 +29,9 @@ public class Sismografo {
         System.out.println("Se cambio el estadoActual del simografo a: " + estadoActual.getNombreEstado());
         CambioEstado ce = buscarEstadoActual();
         ce.setFechaHoraFin(fechaHoraActual);
-        System.out.println("el ce del simografo que se encuentra es : " + ce.getEstado().getNombreEstado());
-        // falta crear el cambio de estado
-        crearCambioEstado(fechaHoraActual, motivoFueraServicios, estado);
+        System.out.println("el ce del simografo que se encuentra es: " + ce.getEstado().getNombreEstado());
+        crearCambioEstado(fechaHoraActual, motivoFueraServicios, estado, responsable);
+        System.out.println("El nuevo Cambio de Estado del sismografo es: " );
 
     }
 

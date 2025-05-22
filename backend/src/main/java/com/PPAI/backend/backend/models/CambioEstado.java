@@ -9,6 +9,7 @@ public class CambioEstado {
 
     private Estado estado;
     private List<MotivoFueraServicio> motivosFueraServicio;
+    private Empleado responsableDeInspeccion;
 
     public void MostrarMotivos(){
         for (MotivoFueraServicio m : motivosFueraServicio){
@@ -31,7 +32,7 @@ public class CambioEstado {
         return false;
     }
 
-    public CambioEstado(LocalDate fechaHoraInicio, Estado estado) {
+    public CambioEstado(LocalDate fechaHoraInicio, Estado estado, Empleado responsableDeInspeccion) {
         this.fechaHoraInicio = fechaHoraInicio;
         this.estado = estado;
     }
