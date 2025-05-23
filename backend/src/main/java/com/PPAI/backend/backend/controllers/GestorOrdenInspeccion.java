@@ -137,7 +137,8 @@ public class GestorOrdenInspeccion {
     }
 
     @GetMapping("/motivos-tipo")
-    public List<MotivoTipo> buscarTiposParaFueraDeServicio() {
+    // buscar
+    public List<MotivoTipo> buscarTiposMotivo() {
         System.out.println("---> Buscando Los Motivos Tipo...");
         for (MotivoTipo motivoTipo : motivoTipos) {
             System.out.println("-"+motivoTipo.getDescripcion());
@@ -329,7 +330,7 @@ public class GestorOrdenInspeccion {
 
         buscarEmpleadoLogueado();
         buscarInspeccionesCompletamenteFinalizadas(); // ojo con sacar esta linea porque esta ejecuta el metodo que busca el sismografo xd -> hay que ver como podemos hacer para obtener el sismografo si utilizar este metodo
-        ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaHoraFinalizacion));
+        ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaFinalizacion));
 
         Estado estadoFueraServicio = new Estado("Ambito Sismografo", "Fuera De Servicio");
         Estado estadoEnLinea = new Estado("Ambito Sismografo", "En Linea");

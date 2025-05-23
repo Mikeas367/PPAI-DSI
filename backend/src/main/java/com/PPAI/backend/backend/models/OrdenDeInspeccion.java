@@ -67,7 +67,7 @@ public class OrdenDeInspeccion {
         this.fechaHoraCierre = fechaHoraCierre;
     }
 
-    public LocalDate getFechaHoraFinalizacion() {
+    public LocalDate getFechaFinalizacion() {
         return fechaHoraFinalizacion;
     }
 
