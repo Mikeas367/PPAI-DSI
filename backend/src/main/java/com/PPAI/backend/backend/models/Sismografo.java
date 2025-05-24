@@ -31,7 +31,7 @@ public class Sismografo {
         ce.setFechaHoraFin(fechaHoraActual);
         System.out.println("el ce del simografo que se encuentra es: " + ce.getEstado().getNombreEstado());
         crearCambioEstado(fechaHoraActual, motivoFueraServicios, estado, responsable);
-        System.out.println("El nuevo Cambio de Estado del sismografo es: " );
+        System.out.println("El nuevo Cambio de Estado del sismografo es: " + buscarEstadoActual().getEstado().getNombreEstado());
 
     }
 

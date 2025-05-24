@@ -31,6 +31,8 @@ public class PantallaCancelacion extends javax.swing.JFrame {
         initComponents();
         jTable1.setVisible(false);
         jTextArea1.setVisible(false);
+        jComboBox1.setVisible(false);
+        jTextArea2.setVisible(false);
     }
 
     /**
@@ -51,6 +53,11 @@ public class PantallaCancelacion extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jButton3 = new javax.swing.JButton();
         jComboBox1 = new javax.swing.JComboBox<>();
+        jButton4 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTextArea2 = new javax.swing.JTextArea();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -129,6 +136,31 @@ public class PantallaCancelacion extends javax.swing.JFrame {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        jButton4.setText("seleccionarMotivo");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        jTextArea2.setColumns(20);
+        jTextArea2.setRows(5);
+        jScrollPane3.setViewportView(jTextArea2);
+
+        jButton5.setText("enviar comentario");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        jButton6.setText("confirmar");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -142,10 +174,19 @@ public class PantallaCancelacion extends javax.swing.JFrame {
                 .addGap(143, 143, 143))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton5)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton3)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jButton4))
+                            .addGap(75, 75, 75)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(59, 59, 59)
+                .addComponent(jButton6)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -159,18 +200,30 @@ public class PantallaCancelacion extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
                 .addGap(42, 42, 42)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(329, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton4))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton5)
+                    .addComponent(jButton6))
+                .addContainerGap(230, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
     public void mostrarTiposMotivo(List<String> motivos){
+        jComboBox1.setVisible(true);
+        jComboBox1.removeAllItems(); // elimino los items por defecto
         for(String motivo : motivos){
             jComboBox1.addItem(motivo);
         }
     }
+    
     public void tomarSeleccionDeOrden(){
     int ordenSeleccionada = jTable1.getSelectedRow();
         System.out.println("se selecciono la fila numero: " + ordenSeleccionada);
@@ -180,11 +233,11 @@ public class PantallaCancelacion extends javax.swing.JFrame {
             gestor.tomarSeleccionDeOrden(seleccionada);
         }
     }
+    
     public void solicitarIngresoDeObservacionDeCierre(){
         // jTextArea1
         jTextArea1.setVisible(true);
         //System.out.println("Esto se ingreso: " + texto);
-       
     }
    
     public void tomarIngresoDeObservacionDeCierre(String txt){
@@ -210,6 +263,25 @@ public class PantallaCancelacion extends javax.swing.JFrame {
     }
     }
     
+    public void solicitarIngresoComentario() {
+        jTextArea2.setEnabled(true);
+        jButton5.setEnabled(true);
+    }
+    
+    public void tomarConfirmacion() {
+        jButton6.setEnabled(false);
+        gestor.tomarConfirmacion();
+    }
+    public void solicitarConfirmacion() {
+    int respuesta = JOptionPane.showConfirmDialog(this,
+            "¿Está seguro que desea confirmar la operación?",
+            "Confirmación",
+            JOptionPane.YES_NO_OPTION);
+
+    if (respuesta == JOptionPane.YES_OPTION) {
+        tomarConfirmacion();
+    }
+}
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         gestor.cerrarOrdenDeInspeccion();
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -218,10 +290,11 @@ public class PantallaCancelacion extends javax.swing.JFrame {
         // TODO add your handling code here:
         tomarSeleccionDeOrden();
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    // tomar seleccionObservacion
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         // tomar seleccionObservacion
+        jTextArea1.setVisible(false);
         String texto = jTextArea1.getText().trim();
         if (!texto.isEmpty()) {
             tomarIngresoDeObservacionDeCierre(texto);
@@ -230,6 +303,38 @@ public class PantallaCancelacion extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Debe ingresar una observación.");
         }
     }//GEN-LAST:event_jButton3ActionPerformed
+    
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        // tomar el motivo tipo
+        jTextArea2.setVisible(true);
+        String motivoSeleccionado = (String) jComboBox1.getSelectedItem();
+    if (motivoSeleccionado != null) {
+        gestor.tomarSeleccionDeTipoFueraDeServicio(motivoSeleccionado);
+        solicitarIngresoComentario();
+    }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        // tomar el comentario
+        String comentario = jTextArea2.getText().trim();
+        if (!comentario.isEmpty()) {
+            gestor.tomarIngresoComentario(comentario);
+            jTextArea2.setText("");
+            jTextArea2.setVisible(false);
+            jTextArea2.setEnabled(false);
+            jButton5.setEnabled(false);
+        } else {
+            JOptionPane.showMessageDialog(this, "Debe ingresar un comentario.");
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
+    // botin confirmar
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+        solicitarConfirmacion();
+        
+    }//GEN-LAST:event_jButton6ActionPerformed
     
     /**
      * @param args the command line arguments
@@ -240,11 +345,16 @@ public class PantallaCancelacion extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables
 }

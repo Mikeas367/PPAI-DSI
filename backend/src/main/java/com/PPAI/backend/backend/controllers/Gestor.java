@@ -9,6 +9,7 @@ import com.PPAI.backend.backend.models.CambioEstado;
 import com.PPAI.backend.backend.models.Empleado;
 import com.PPAI.backend.backend.models.EstacionSismologica;
 import com.PPAI.backend.backend.models.Estado;
+import com.PPAI.backend.backend.models.MotivoFueraServicio;
 import com.PPAI.backend.backend.models.MotivoTipo;
 import com.PPAI.backend.backend.models.OrdenDeInspeccion;
 import com.PPAI.backend.backend.models.Sesion;
@@ -33,7 +34,8 @@ public class Gestor {
     List<Empleado> empleados = new ArrayList<>();
     List<Estado> estados = new ArrayList<>();
     List<MotivoTipo> motivosTipos = new ArrayList<>();
-    
+    List<CambioEstado> cambioEstadosSismografro= new ArrayList<>();
+     
     private Sesion sesion;
     private Empleado empleadoLogueado;
     private PantallaCancelacion pantalla;
@@ -44,7 +46,26 @@ public class Gestor {
     
     private Sismografo sismografoSeleccionado;
     private OrdenDeInspeccion ordenSeleccionada;
-    private String observacion;
+    private String observacionCierre;
+    
+    private String comentarioIngresado;
+    private String motivoTipoSeleccionado;
+    private LocalDate fechaHoraActual;
+    List<MotivoFueraServicio> motivosFueraServicio = new ArrayList<>();
+    
+    
+    public void obtenerFechaHoraActual(){
+        this.fechaHoraActual = LocalDate.now();
+    }
+    
+    public void tomarConfirmacion() {
+        Estado estadoCerrada = buscarEstadoCerrada();
+        this.ordenSeleccionada.Cerrar(estadoCerrada, observacionCierre);
+        obtenerFechaHoraActual();
+        this.ordenSeleccionada.setFechaHoraCierre(fechaHoraActual);
+        Estado estadoFueraServicio = buscarEstadoFueraDeServicio();
+        this.sismografoSeleccionado.ponerEnFueraServicio(estadoFueraServicio, motivosFueraServicio, fechaHoraActual, empleadoLogueado);
+    }
     
     public void cerrarOrdenDeInspeccion() {
         //List<OrdenDeInspeccionDTO> ordenesDeInspeccionFinalizadas = new ArrayList<>();
@@ -56,6 +77,10 @@ public class Gestor {
         
         pantalla.mostrarDatosDeOrdenes(ordenesDeInspeccionFinalizadas);
         ordenesDeInspeccionFinalizadas.clear(); // lo limpio porque sino se añaden los mismos datos
+        buscarTiposMotivo();
+        pantalla.mostrarTiposMotivo(motivoDescripciones);
+        
+       
         
    
         
@@ -65,14 +90,30 @@ public class Gestor {
         
     }
     
+    // esto es para el motivo de cierre
+    public void tomarIngresoComentario(String comentario) {
+        this.comentarioIngresado = comentario;
+        MotivoFueraServicio motivo = new MotivoFueraServicio();
+        motivo.setComentario(comentario);
+        motivosFueraServicio.add(motivo);
+    
+        System.out.println("Comentario ingresado: " + comentario);
+}
+    public void tomarSeleccionDeTipoFueraDeServicio(String motivoTipo) {
+    this.motivoTipoSeleccionado = motivoTipo;
+    System.out.println("Motivo seleccionado: " + motivoTipo);
+}
+    
     public void tomarObservacionCierre(String txt){
         System.out.println("El texto que envio de la pantalla es: " + txt);
-        this.observacion = txt;
+        this.observacionCierre = txt;
+        //buscarTiposMotivo();
     }
     
     public void buscarSismografoPorId(int id){
         for(Sismografo sis : sismografos){
             if(sis.getIdentificadorSismografo() == id){
+                sis.setCambioEstados(cambioEstadosSismografro);
                 this.sismografoSeleccionado = sis;
             }
         }
@@ -91,8 +132,25 @@ public class Gestor {
         for(MotivoTipo motivo : motivosTipo){
             motivoDescripciones.add(motivo.getDescripcion());
         }
-        pantalla.mostrarTiposMotivo(motivoDescripciones);
+        //pantalla.mostrarTiposMotivo(motivoDescripciones);
+    }
     
+    public Estado buscarEstadoCerrada(){
+        for(Estado estado: estados){
+            if(estado.esDeAmbitoOrdenDeInspeccion() && estado.esCerrada()){
+                return estado;
+            }
+        }
+        return null;
+    }
+    
+    public Estado buscarEstadoFueraDeServicio(){
+        for(Estado estado: estados){
+            if(estado.esDeAmbitoSismografo() && estado.esFueraDeServicio()){
+                return estado;
+            }
+        }
+        return null;
     }
     
     public void tomarSeleccionDeOrden(OrdenDeInspeccionDTO ordenInspeccion){
@@ -265,15 +323,15 @@ public class Gestor {
         //ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaHoraFinalizacion));
 
         // aca es medio un lio porque necesitaba que el sismografro tuviese cambio de estados.
-        //sismografoSeleccionado.setEstadoActual(estadoFueraDeLinea);
-        //CambioEstado  cambioEstado1 = new CambioEstado(fechaEspecifica1, estadoEnLinea, null);
-        //cambioEstado1.setFechaHoraFin(LocalDate.now());
+        sismografoSeleccionado.setEstadoActual(estadoFueraDeLinea);
+        CambioEstado  cambioEstado1 = new CambioEstado(fechaEspecifica1, estadoEnLinea, null);
+        cambioEstado1.setFechaHoraFin(LocalDate.now());
 
-        //CambioEstado cambioEstado2 = new CambioEstado(fechaEspecifica2, estadoFueraDeLinea, null);
-        //cambioEstadosSismografro.add(cambioEstado1);
-        //cambioEstadosSismografro.add(cambioEstado2);// este tiene fecha fin null
-        //cambioEstado2.setFechaHoraFin(null);
-        //sismografoSeleccionado.setCambioEstados(cambioEstadosSismografro);
+        CambioEstado cambioEstado2 = new CambioEstado(fechaEspecifica2, estadoFueraDeLinea, null);
+        cambioEstadosSismografro.add(cambioEstado1);
+        cambioEstadosSismografro.add(cambioEstado2);// este tiene fecha fin null
+        cambioEstado2.setFechaHoraFin(null);
+        sismografoSeleccionado.setCambioEstados(cambioEstadosSismografro);
 
         estados.add(estadoCompletamenteRealizada);
         estados.add(estadoPendienteDeRealizacion);
@@ -281,4 +339,5 @@ public class Gestor {
         estados.add(estadoFueraServicio);
         estados.add(estadoEnLinea);
     }
+
 }
