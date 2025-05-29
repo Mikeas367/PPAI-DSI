@@ -1,25 +1,16 @@
 package com.PPAI.backend.backend.models;
 
 public class MotivoTipo {
-    private int id;
     private String descripcion;
 
 
     public MotivoTipo() {
     }
 
-    public MotivoTipo(int id, String descripcion) {
-        this.id = id;
+    public MotivoTipo(String descripcion) {
         this.descripcion = descripcion;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        id = id;
-    }
 
     public String getDescripcion() {
         return descripcion;
@@ -27,5 +18,9 @@ public class MotivoTipo {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+    @Override
+    public String toString() {
+        return descripcion; // esto es importante para que se vea bien en el JComboBox
     }
 }

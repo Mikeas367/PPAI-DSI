@@ -2,6 +2,8 @@ package gui;
 
 import com.PPAI.backend.backend.DTOs.OrdenDeInspeccionDTO;
 import com.PPAI.backend.backend.controllers.Gestor;
+import com.PPAI.backend.backend.models.MotivoFueraServicio;
+import com.PPAI.backend.backend.models.MotivoTipo;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,6 +15,8 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
     private Gestor gestor;
     private List<OrdenDeInspeccionDTO> ordenesEnTabla = new ArrayList<>();
     private VentanaPrincipalCerrarOrden ventanaPrincipal;
+
+    private List<MotivoTipo> motivosSeleccionados = new ArrayList<>();
 
     public PantallaCierreDeOrdenDeInspeccion(VentanaPrincipalCerrarOrden ventanaPrincipal) {
         this.ventanaPrincipal = ventanaPrincipal;
@@ -113,7 +117,7 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
         panelMotivo.add(new JLabel("Seleccione Motivo:"), gbc);
 
         gbc.gridx = 1;
-        jComboBox1 = new JComboBox<>();
+        jComboBox1 = new JComboBox<MotivoTipo>();
         jComboBox1.setFont(fuenteTexto);
         panelMotivo.add(jComboBox1, gbc);
 
@@ -162,10 +166,10 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
         return boton;
     }
 
-    public void mostrarTiposMotivo(List<String> motivos) {
+    public void mostrarTiposMotivo(List<MotivoTipo> motivos) {
         jComboBox1.setVisible(true);
         jComboBox1.removeAllItems();
-        for (String motivo : motivos) {
+        for (MotivoTipo motivo : motivos) {
             jComboBox1.addItem(motivo);
         }
     }
@@ -224,10 +228,9 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
     
     public void tomarSeleccionDeTipoFueraDeServicio(){
         jTextArea2.setVisible(true);
-        String motivo = (String) jComboBox1.getSelectedItem();
+        MotivoTipo motivo = (MotivoTipo) jComboBox1.getSelectedItem();
         if (motivo != null) {
             gestor.tomarSeleccionDeTipoFueraDeServicio(motivo);
-            
         }
     }
     public void tomarIngresoComentario(){
@@ -276,7 +279,7 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
     }
 
     private JButton jButton1, jButton2, jButton3, jButton4, jButton5, jButton6;
-    private JComboBox<String> jComboBox1;
+    private JComboBox<MotivoTipo> jComboBox1;
     private JScrollPane jScrollPane1, jScrollPane2, jScrollPane3;
     private JTable jTable1;
     private JTextArea jTextArea1, jTextArea2;

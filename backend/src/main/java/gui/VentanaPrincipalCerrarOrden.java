@@ -25,21 +25,13 @@ public class VentanaPrincipalCerrarOrden extends JFrame {
                 BorderFactory.createEmptyBorder(8, 20, 8, 20)
         ));
 
-        btnCerrarOrden.addActionListener(e -> {
-            if (pantallaCancelacion == null || !pantallaCancelacion.isDisplayable()) {
-                pantallaCancelacion = new PantallaCierreDeOrdenDeInspeccion(this);
-                pantallaCancelacion.setVisible(true);
-                this.setEnabled(false); // deshabilita la ventana principal mientras está abierta la de cancelación
-            } else {
-                pantallaCancelacion.toFront();
-                pantallaCancelacion.requestFocus();
-            }
+        btnCerrarOrden.addActionListener(e -> {OpcionCerrarOrdenDeInspeccion();
         });
 
         setLayout(new GridBagLayout());
         add(btnCerrarOrden);
     }
-    public void OpcionCerrarOrdenDeInspección(){
+    public void OpcionCerrarOrdenDeInspeccion(){
         if (pantallaCancelacion == null || !pantallaCancelacion.isDisplayable()) {
                 pantallaCancelacion = new PantallaCierreDeOrdenDeInspeccion(this);
                 pantallaCancelacion.setVisible(true);

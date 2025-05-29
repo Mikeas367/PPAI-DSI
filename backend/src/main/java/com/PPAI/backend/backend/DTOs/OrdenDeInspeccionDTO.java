@@ -1,5 +1,7 @@
 package com.PPAI.backend.backend.DTOs;
 
+import com.PPAI.backend.backend.models.Sismografo;
+
 import java.time.LocalDate;
 
 public class OrdenDeInspeccionDTO {
@@ -8,8 +10,10 @@ public class OrdenDeInspeccionDTO {
     private LocalDate  fechaHoraFinalizacion;
     private String nombreEstacionSismologica;
     private  int identificadorSismografo;
+    private Sismografo sismografo;
 
-    public OrdenDeInspeccionDTO(int numeroOrden, LocalDate  fechaHoraFinalizacion, String nombreEstacionSismologica , int identificadorSismografo) {
+    public OrdenDeInspeccionDTO(int numeroOrden, LocalDate  fechaHoraFinalizacion, String nombreEstacionSismologica , int identificadorSismografo, Sismografo sismografo) {
+        this.sismografo = sismografo;
         this.numeroOrden = numeroOrden;
         this.fechaHoraFinalizacion = fechaHoraFinalizacion;
         this.nombreEstacionSismologica = nombreEstacionSismologica;
@@ -38,6 +42,14 @@ public class OrdenDeInspeccionDTO {
 
     public void setFechaHoraFinalizacion(LocalDate  fechaHoraFinalizacion) {
         this.fechaHoraFinalizacion = fechaHoraFinalizacion;
+    }
+
+    public Sismografo getSismografo() {
+        return sismografo;
+    }
+
+    public void setSismografo(Sismografo sismografo) {
+        this.sismografo = sismografo;
     }
 
     public String getNombreEstacionSismologica() {

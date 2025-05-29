@@ -21,9 +21,11 @@ public class Sismografo {
     }
 
     public void ponerEnFueraServicio(Estado estado, List<MotivoFueraServicio> motivoFueraServicios, LocalDate fechaHoraActual, Empleado responsable) {
+
         for (MotivoFueraServicio m : motivoFueraServicios){
-            System.out.println("Esto son los Motivos que me llegan al sismografo para crear el CE: " + m.getComentario());
+            System.out.println("Esto son los Motivos que me llegan al sismografo para crear el CE: " + m.getMotivoTipo());
         }
+
         System.out.println("----> Poniendo en fuera de servicio el sismografo");
         CambioEstado ce = buscarEstadoActual();
         ce.setFechaHoraFin(fechaHoraActual);

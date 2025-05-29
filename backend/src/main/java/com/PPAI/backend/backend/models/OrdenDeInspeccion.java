@@ -27,10 +27,16 @@ public class OrdenDeInspeccion {
         
     }
 
+    public String  mostrarEstacionSismologica(){
+        return this.estacionSismologica.getNombre();
+    }
     public OrdenDeInspeccionDTO obtenerDatos() {
         Sismografo sis = estacionSismologica.buscarSismografo();
-        OrdenDeInspeccionDTO datos = new OrdenDeInspeccionDTO(this.numeroOrden, this.fechaHoraFinalizacion,
-                this.estacionSismologica.getNombre(), sis.getIdentificadorSismografo());
+        OrdenDeInspeccionDTO datos = new OrdenDeInspeccionDTO(
+                this.numeroOrden,
+                this.fechaHoraFinalizacion,
+                mostrarEstacionSismologica(),
+                sis.getIdentificadorSismografo(), sis);
         return datos;
     }
 

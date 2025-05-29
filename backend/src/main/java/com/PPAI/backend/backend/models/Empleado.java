@@ -1,19 +1,37 @@
 package com.PPAI.backend.backend.models;
-
+import com.PPAI.backend.backend.models.Rol;
 public class Empleado {
     private String apellido;
     private String mail;
     private String nombre;
     private String telefono;
+    
+    private Rol rol;
 
     public Empleado() {
     }
 
-    public Empleado(String apellido, String mail, String nombre, String telefono) {
+    public Empleado(String apellido, String mail, String nombre, String telefono, Rol rol) {
         this.apellido = apellido;
         this.mail = mail;
         this.nombre = nombre;
         this.telefono = telefono;
+        this.rol = rol;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+    
+    public boolean esResponsableDeReparacion(){
+        if(this.rol.sosResponsableReparacion()){
+            return true;
+        }
+        return false;
     }
 
     // setters and getters

@@ -11,7 +11,7 @@ public class CambioEstado {
     private List<MotivoFueraServicio> motivosFueraServicio;
     private Empleado responsableDeInspeccion;
 
-    public void MostrarMotivos(){
+    public void mostrarMotivos(){
         for (MotivoFueraServicio m : motivosFueraServicio){
             System.out.println("Esto es la motivo" + m.getComentario());
         }
