@@ -123,9 +123,11 @@ public class Gestor {
     // esto es para el motivo de cierre
     public void tomarIngresoComentario(String comentario) {
         MotivoFueraServicio motivo = new MotivoFueraServicio();
+
         motivo.setComentario(comentario);
         motivo.setMotivoTipo(motivoTipoSeleccionado);
-        motivosFueraServicio.add(motivo);
+
+        motivosFueraServicio.add(motivo); // se le mandan para el cambio de estado del sismografo
 
         System.out.println("Comentario ingresado: " + comentario);
     }

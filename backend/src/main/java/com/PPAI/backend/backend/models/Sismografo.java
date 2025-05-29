@@ -27,18 +27,18 @@ public class Sismografo {
         }
 
         System.out.println("----> Poniendo en fuera de servicio el sismografo");
-        CambioEstado ce = buscarEstadoActual();
+        CambioEstado ce = buscarCambioEstadoActual();
         ce.setFechaHoraFin(fechaHoraActual);
         setEstadoActual(estado);
         System.out.println("Se cambio el estadoActual del simografo a: " + estadoActual.getNombreEstado());
         
         System.out.println("el ce del simografo que se encuentra es: " + ce.getEstado().getNombreEstado());
         crearNuevoCambioEstado(fechaHoraActual, motivoFueraServicios, estado, responsable);
-        System.out.println("El nuevo Cambio de Estado del sismografo es: " + buscarEstadoActual().getEstado().getNombreEstado());
+        System.out.println("El nuevo Cambio de Estado del sismografo es: " + buscarCambioEstadoActual().getEstado().getNombreEstado());
 
     }
 
-    public CambioEstado buscarEstadoActual(){
+    public CambioEstado buscarCambioEstadoActual(){
         for (CambioEstado cambioEstado : cambioEstados) {
             if (cambioEstado.esActual()){
                 return cambioEstado;

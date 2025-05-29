@@ -16,7 +16,6 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
     private List<OrdenDeInspeccionDTO> ordenesEnTabla = new ArrayList<>();
     private VentanaPrincipalCerrarOrden ventanaPrincipal;
 
-    private List<MotivoTipo> motivosSeleccionados = new ArrayList<>();
 
     public PantallaCierreDeOrdenDeInspeccion(VentanaPrincipalCerrarOrden ventanaPrincipal) {
         this.ventanaPrincipal = ventanaPrincipal;
