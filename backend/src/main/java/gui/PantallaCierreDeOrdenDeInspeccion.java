@@ -9,12 +9,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PantallaCancelacion extends JFrame {
+public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
     private Gestor gestor;
     private List<OrdenDeInspeccionDTO> ordenesEnTabla = new ArrayList<>();
     private VentanaPrincipalCerrarOrden ventanaPrincipal;
 
-    public PantallaCancelacion(VentanaPrincipalCerrarOrden ventanaPrincipal) {
+    public PantallaCierreDeOrdenDeInspeccion(VentanaPrincipalCerrarOrden ventanaPrincipal) {
         this.ventanaPrincipal = ventanaPrincipal;
         this.gestor = new Gestor(this);
         initComponents();
@@ -146,7 +146,12 @@ public class PantallaCancelacion extends JFrame {
         mainPanel.add(panelMotivo);
         getContentPane().add(mainPanel);
     }
-
+    
+    public void habilitarPantalla(){
+        this.setVisible(true);
+        this.toFront();
+        this.requestFocus();
+    }
     private JButton crearBoton(String texto, Color colorFondo) {
         JButton boton = new JButton(texto);
         boton.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -179,10 +184,11 @@ public class PantallaCancelacion extends JFrame {
     }
 
     public void tomarIngresoDeObservacionDeCierre(String txt) {
-        gestor.tomarObservacionCierre(txt);
+        gestor.tomarObservacionDeCierre(txt);
     }
 
     public void mostrarDatosDeOrdenes(List<OrdenDeInspeccionDTO> ordenes) {
+        jButton6.setEnabled(true);
         jTable1.setVisible(true);
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
         modelo.setRowCount(0);
@@ -215,7 +221,28 @@ public class PantallaCancelacion extends JFrame {
             tomarConfirmacion();
         }
     }
-
+    
+    public void tomarSeleccionDeTipoFueraDeServicio(){
+        jTextArea2.setVisible(true);
+        String motivo = (String) jComboBox1.getSelectedItem();
+        if (motivo != null) {
+            gestor.tomarSeleccionDeTipoFueraDeServicio(motivo);
+            
+        }
+    }
+    public void tomarIngresoComentario(){
+        String comentario = jTextArea2.getText().trim();
+        if (!comentario.isEmpty()) {
+            gestor.tomarIngresoComentario(comentario);
+            jTextArea2.setText("");
+            jTextArea2.setVisible(false);
+            jTextArea2.setEnabled(false);
+            jButton5.setEnabled(false);
+        } else {
+            JOptionPane.showMessageDialog(this, "Debe ingresar un comentario.");
+        }
+        
+    }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
         gestor.cerrarOrdenDeInspeccion();
     }
@@ -234,27 +261,14 @@ public class PantallaCancelacion extends JFrame {
             JOptionPane.showMessageDialog(this, "Debe ingresar una observación.");
         }
     }
-
+    
+    // este boton seria el tomarSeleccionDeTipoFueraDeServicio
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
-        jTextArea2.setVisible(true);
-        String motivo = (String) jComboBox1.getSelectedItem();
-        if (motivo != null) {
-            gestor.tomarSeleccionDeTipoFueraDeServicio(motivo);
-            solicitarIngresoComentario();
-        }
+        tomarSeleccionDeTipoFueraDeServicio();
     }
-
+    
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
-        String comentario = jTextArea2.getText().trim();
-        if (!comentario.isEmpty()) {
-            gestor.tomarIngresoComentario(comentario);
-            jTextArea2.setText("");
-            jTextArea2.setVisible(false);
-            jTextArea2.setEnabled(false);
-            jButton5.setEnabled(false);
-        } else {
-            JOptionPane.showMessageDialog(this, "Debe ingresar un comentario.");
-        }
+        tomarIngresoComentario();
     }
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {

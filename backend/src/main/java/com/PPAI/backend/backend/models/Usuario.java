@@ -10,6 +10,10 @@ public class Usuario {
 
     public Usuario() {
     }
+    
+    public Empleado getRILogueado(){
+        return this.empleado;
+    }
 
     public Usuario(String nombreUsuario, String contrasenia, Empleado empleado) {
         this.nombreUsuario = nombreUsuario;

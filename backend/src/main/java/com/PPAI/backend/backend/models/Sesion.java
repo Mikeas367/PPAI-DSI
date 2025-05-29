@@ -18,4 +18,8 @@ public class Sesion {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+    
+    public Empleado obtenerEmpleado(){
+       return usuario.getRILogueado();
+    }
 }

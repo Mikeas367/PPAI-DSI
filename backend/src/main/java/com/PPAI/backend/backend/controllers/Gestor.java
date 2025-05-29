@@ -15,7 +15,7 @@ import com.PPAI.backend.backend.models.OrdenDeInspeccion;
 import com.PPAI.backend.backend.models.Sesion;
 import com.PPAI.backend.backend.models.Sismografo;
 import com.PPAI.backend.backend.models.Usuario;
-import gui.PantallaCancelacion;
+import gui.PantallaCierreDeOrdenDeInspeccion;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,7 +38,7 @@ public class Gestor {
      
     private Sesion sesion;
     private Empleado empleadoLogueado;
-    private PantallaCancelacion pantalla;
+    private PantallaCierreDeOrdenDeInspeccion pantalla;
 
     //ordenesDeInspeccion
 
@@ -54,31 +54,43 @@ public class Gestor {
     private String motivoTipoSeleccionado;
     private LocalDate fechaHoraActual;
     List<MotivoFueraServicio> motivosFueraServicio = new ArrayList<>();
+    List<String> emailEmpleadosRR = new ArrayList<>();
     
     
     public void obtenerFechaHoraActual(){
         this.fechaHoraActual = LocalDate.now();
     }
+  
+    public void validarDatosCierre(){
+        if(observacionCierre == null || motivosFueraServicio.size() == 0){
+            System.out.println("ESTAN MAL LOS DATOS");
+        }
+    }
     
     public void tomarConfirmacion() {
-        Estado estadoCerrada = buscarEstadoCerrada();
-        this.ordenSeleccionada.Cerrar(estadoCerrada, observacionCierre);
+        validarDatosCierre();
         obtenerFechaHoraActual();
+        Estado estadoCerrada = buscarEstadoCerrada();
+        this.ordenSeleccionada.cerrar(estadoCerrada, observacionCierre);
         this.ordenSeleccionada.setFechaHoraCierre(fechaHoraActual);
         Estado estadoFueraServicio = buscarEstadoFueraDeServicio();
         this.sismografoSeleccionado.ponerEnFueraServicio(estadoFueraServicio, motivosFueraServicio, fechaHoraActual, empleadoLogueado);
     }
     
+    public void ordenarOrdenesPorFechaDeFinalizacion(){
+        this.ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccionDTO::getFechaHoraFinalizacion));
+    }
     public void cerrarOrdenDeInspeccion() {
 
         buscarEmpleadoLogueado();
         buscarInspeccionesCompletamenteRealizadas();
-        
+        ordenarOrdenesPorFechaDeFinalizacion();
 
         pantalla.mostrarDatosDeOrdenes(ordenesDeInspeccionFinalizadas);
         ordenesDeInspeccionFinalizadas.clear(); // lo limpio porque sino se añaden los mismos datos
         buscarTiposMotivo();
         pantalla.mostrarTiposMotivo(motivoDescripciones);
+      
         
 
         
@@ -95,10 +107,11 @@ public class Gestor {
 }
     public void tomarSeleccionDeTipoFueraDeServicio(String motivoTipo) {
     this.motivoTipoSeleccionado = motivoTipo;
+    pantalla.solicitarIngresoComentario();
     System.out.println("Motivo seleccionado: " + motivoTipo);
 }
     
-    public void tomarObservacionCierre(String txt){
+    public void tomarObservacionDeCierre(String txt){
         System.out.println("El texto que envio de la pantalla es: " + txt);
         this.observacionCierre = txt;
     }
@@ -165,12 +178,11 @@ public class Gestor {
     
     }
     
-    public Empleado buscarEmpleadoLogueado(){
-        this.empleadoLogueado = sesion.getUsuario().getEmpleado();
-        return sesion.getUsuario().getEmpleado();
+    public void buscarEmpleadoLogueado(){
+        this.empleadoLogueado = sesion.obtenerEmpleado();
     }
     
-    public Gestor(PantallaCancelacion pantalla){
+    public Gestor(PantallaCierreDeOrdenDeInspeccion pantalla){
         this.pantalla = pantalla;
         
         MotivoTipo motivoTipo = new MotivoTipo(1,"se rompio la punta del sismografo");

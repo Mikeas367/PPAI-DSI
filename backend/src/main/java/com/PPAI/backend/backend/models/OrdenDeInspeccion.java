@@ -20,7 +20,7 @@ public class OrdenDeInspeccion {
 
     // metodos de la solucion
 
-    public void Cerrar(Estado estado, String observacionCierre){
+    public void cerrar(Estado estado, String observacionCierre){
         System.out.println("Se Cerro la Orden por: " + observacionCierre);
         this.estado = estado;
         this.observacionCierre = observacionCierre;

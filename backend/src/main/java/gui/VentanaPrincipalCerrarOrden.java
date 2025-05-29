@@ -7,7 +7,7 @@ import java.awt.event.*;
 public class VentanaPrincipalCerrarOrden extends JFrame {
 
     private JButton btnCerrarOrden;
-    private PantallaCancelacion pantallaCancelacion;
+    private PantallaCierreDeOrdenDeInspeccion pantallaCancelacion;
 
     public VentanaPrincipalCerrarOrden() {
         setTitle("Gestión de Ordenes");
@@ -27,7 +27,7 @@ public class VentanaPrincipalCerrarOrden extends JFrame {
 
         btnCerrarOrden.addActionListener(e -> {
             if (pantallaCancelacion == null || !pantallaCancelacion.isDisplayable()) {
-                pantallaCancelacion = new PantallaCancelacion(this);
+                pantallaCancelacion = new PantallaCierreDeOrdenDeInspeccion(this);
                 pantallaCancelacion.setVisible(true);
                 this.setEnabled(false); // deshabilita la ventana principal mientras está abierta la de cancelación
             } else {
@@ -38,6 +38,15 @@ public class VentanaPrincipalCerrarOrden extends JFrame {
 
         setLayout(new GridBagLayout());
         add(btnCerrarOrden);
+    }
+    public void OpcionCerrarOrdenDeInspección(){
+        if (pantallaCancelacion == null || !pantallaCancelacion.isDisplayable()) {
+                pantallaCancelacion = new PantallaCierreDeOrdenDeInspeccion(this);
+                pantallaCancelacion.setVisible(true);
+                this.setEnabled(false); // deshabilita la ventana principal mientras está abierta la de cancelación
+            } else {
+                this.pantallaCancelacion.habilitarPantalla();
+            }
     }
 
     public void habilitarVentanaPrincipal() {
