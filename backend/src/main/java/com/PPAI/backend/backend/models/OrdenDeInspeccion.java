@@ -49,8 +49,6 @@ public class OrdenDeInspeccion {
     }
 
     // constructores
-    public OrdenDeInspeccion() {
-    }
 
     public OrdenDeInspeccion(LocalDate  fechaHoraCierre, LocalDate  fechaHoraFinalizacion,
                              LocalDate  fechaHoraInicio, int numeroOrden, String observacionCierre) {

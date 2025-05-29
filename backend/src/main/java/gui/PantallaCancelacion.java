@@ -157,8 +157,6 @@ public class PantallaCancelacion extends JFrame {
         return boton;
     }
 
-    // Resto de métodos lógicos sin modificar...
-
     public void mostrarTiposMotivo(List<String> motivos) {
         jComboBox1.setVisible(true);
         jComboBox1.removeAllItems();

@@ -2,9 +2,6 @@ package com.PPAI.backend.backend.DTOs;
 
 import java.time.LocalDate;
 
-// los datos que necesitaria seria -> numeroDeOrden
-// -> fechaHoraFinalizacion
-// -> nombre de la Estacion Sismologica
 public class OrdenDeInspeccionDTO {
 
     private int numeroOrden;

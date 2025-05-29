@@ -39,7 +39,9 @@ public class Gestor {
     private Sesion sesion;
     private Empleado empleadoLogueado;
     private PantallaCancelacion pantalla;
+
     //ordenesDeInspeccion
+
     List<OrdenDeInspeccion> ordenesDeInspeccion = new ArrayList<>();
     List<OrdenDeInspeccionDTO> ordenesDeInspeccionFinalizadas = new ArrayList<>();
     List<String> motivoDescripciones = new ArrayList<>();
@@ -68,25 +70,17 @@ public class Gestor {
     }
     
     public void cerrarOrdenDeInspeccion() {
-        //List<OrdenDeInspeccionDTO> ordenesDeInspeccionFinalizadas = new ArrayList<>();
-        //System.out.println("Se selecciono la opcion Cerrar Orden De Inspeccion");
+
         buscarEmpleadoLogueado();
         buscarInspeccionesCompletamenteRealizadas();
         
-        //System.out.println("Cantidad de órdenes encontradas: " + ordenesDeInspeccionFinalizadas.size());
-        
+
         pantalla.mostrarDatosDeOrdenes(ordenesDeInspeccionFinalizadas);
         ordenesDeInspeccionFinalizadas.clear(); // lo limpio porque sino se añaden los mismos datos
         buscarTiposMotivo();
         pantalla.mostrarTiposMotivo(motivoDescripciones);
         
-       
-        
-   
-        
-        
-        
-        //ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaHoraFinalizacion));
+
         
     }
     
@@ -107,7 +101,6 @@ public class Gestor {
     public void tomarObservacionCierre(String txt){
         System.out.println("El texto que envio de la pantalla es: " + txt);
         this.observacionCierre = txt;
-        //buscarTiposMotivo();
     }
     
     public void buscarSismografoPorId(int id){
@@ -132,7 +125,6 @@ public class Gestor {
         for(MotivoTipo motivo : motivosTipo){
             motivoDescripciones.add(motivo.getDescripcion());
         }
-        //pantalla.mostrarTiposMotivo(motivoDescripciones);
     }
     
     public Estado buscarEstadoCerrada(){
@@ -168,7 +160,6 @@ public class Gestor {
                 OrdenDeInspeccionDTO dto = orden.obtenerDatos();
                 ordenesDeInspeccionFinalizadas.add(dto);
                 
-                //System.out.println("Se encontro una orden");
             }
         }
     

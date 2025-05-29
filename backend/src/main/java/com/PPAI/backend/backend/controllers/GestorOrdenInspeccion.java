@@ -3,7 +3,6 @@ package com.PPAI.backend.backend.controllers;
 import com.PPAI.backend.backend.DTOs.MotivoFueraServicioDTO;
 import com.PPAI.backend.backend.DTOs.OrdenDeInspeccionDTO;
 import com.PPAI.backend.backend.models.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +50,6 @@ public class GestorOrdenInspeccion {
                 orden.setEstado(estadoCerrada); // seteo el estado
                 orden.setFechaHoraCierre(fechaHoraActual); // seteo la fechahoracierre
                 System.out.println("EL ESTADO DE LA ORDEN SE CAMBIO A: " + orden.getEstado().getNombreEstado());
-                //return ResponseEntity.ok("Estado actualizado con éxito");
             }
 
         }
@@ -61,10 +59,8 @@ public class GestorOrdenInspeccion {
         // Creo los motivos de fuera de servicio aca ya que sino deberia crear otro array en el cambio de estado
         // lo ideal seria tener una base de datos, porque sino no puedo acceder a los datos q hago aca desde otras clases
         for (MotivoFueraServicioDTO motivo : motivos) {
-            //System.out.println("esta es la descripcion que me manda el front: " + motivo.getComentario());
 
             MotivoTipo motivoTipoSelecc = buscarMotivoTipoPorId(motivo.getIdMotivoTipo()); // motivo Tipo que viene del front
-            //System.out.println("este es el motivo tipo que me manda el front: " + motivoTipoSelecc.getDescripcion());
             motivoTiposSelecc.add(motivoTipoSelecc);
 
             MotivoFueraServicio motivoFueraServicioSelecc = new MotivoFueraServicio(); // voy a crear cada uno de los motivosFueraServicio
@@ -81,7 +77,6 @@ public class GestorOrdenInspeccion {
         System.out.println("--> Asi esta el Cambio Estado antes de cerrar la orden: " + sismografoSeleccionado.getEstadoActual().getNombreEstado());
 
         Estado fueraServicio = buscarEstadoFueraDeServicio();
-        //System.out.println("Fuera de servicio: " + fueraServicio.getNombreEstado());
 
         sismografoSeleccionado.ponerEnFueraServicio(fueraServicio, motivoFueraServicios, fechaHoraActual, empleadoLogueado);
 
@@ -90,7 +85,6 @@ public class GestorOrdenInspeccion {
                 orden.setEstado(estadoCerrada); // seteo el estado
                 orden.setFechaHoraCierre(fechaHoraActual); // seteo la fechahoracierre
                 System.out.println("EL ESTADO DE LA ORDEN SE CAMBIO A: " + orden.getEstado().getNombreEstado());
-                //return ResponseEntity.ok("Estado actualizado con éxito");
             }
 
         }
@@ -169,18 +163,6 @@ public class GestorOrdenInspeccion {
         }
         return null;
     }
-
-
-
-    //public void buscarInspeccionesCompletamenteFinalizadas(){
-    //    System.out.println("aca entro wacho");
-    //
-    //    for (OrdenDeInspeccion orden: ordenesDeInspeccion) {
-    //        if (orden.sosDeEmpleado(empleadoLogueado) && orden.esCompletamenteRealizada()){
-    //            ordenesDeInspeccionFinalizadas.add(orden);
-    //        }
-    //    }
-    //}F
 
     public void enviarEmails(){
         System.out.println("---> Enviando emails...");
@@ -326,7 +308,6 @@ public class GestorOrdenInspeccion {
         Sesion sesion3 = new Sesion(usuario3);
 
         this.sesion = sesion3; // aca podemos elegir la sesion, LA SESION 1 NO TIENE ORDENES COMPLETADAS
-        // (me olvide q se lo habia puesto asi y estuve renegando como mono porque no sabia q re poronga era q me enviava un array vacio)
 
         buscarEmpleadoLogueado();
         buscarInspeccionesCompletamenteFinalizadas(); // ojo con sacar esta linea porque esta ejecuta el metodo que busca el sismografo xd -> hay que ver como podemos hacer para obtener el sismografo si utilizar este metodo
@@ -335,7 +316,7 @@ public class GestorOrdenInspeccion {
         Estado estadoFueraServicio = new Estado("Ambito Sismografo", "Fuera De Servicio");
         Estado estadoEnLinea = new Estado("Ambito Sismografo", "En Linea");
         Estado estadoFueraDeLinea = new Estado("Ambito Sismografo", "Fuera De Linea");
-        // aca es medio un lio porque necesitaba que el sismografro tuviese cambio de estados.
+
         sismografoSeleccionado.setEstadoActual(estadoFueraDeLinea);
         CambioEstado  cambioEstado1 = new CambioEstado(fechaEspecifica1, estadoEnLinea, null);
         cambioEstado1.setFechaHoraFin(LocalDate.now());
@@ -351,9 +332,6 @@ public class GestorOrdenInspeccion {
         estados.add(estadoCerrada);
         estados.add(estadoFueraServicio);
         estados.add(estadoEnLinea);
-
-
-
 
         //inspeccionesCompletamenteFinalizadas
     }

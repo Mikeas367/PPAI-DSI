@@ -43,9 +43,6 @@ public class Estado {
         return false;
     }
 
-
-
-
     // contrusctores
     public Estado() {
     }
