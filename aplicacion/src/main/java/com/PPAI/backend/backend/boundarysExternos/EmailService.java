@@ -8,8 +8,8 @@ import java.util.Properties;
 
 public class EmailService {
 
-    private final String username = "pmiqueas0@gmail.com";
-    private final String password = "mpyf nhec eouv yqfr";
+    private final String username = ""; // tu gmail
+    private final String password = ""; // el password que te da gmail
 
     private Session createSession() {
         Properties props = new Properties();
