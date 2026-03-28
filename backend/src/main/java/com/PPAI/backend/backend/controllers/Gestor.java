@@ -1,24 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.PPAI.backend.backend.controllers;
 
 import com.PPAI.backend.backend.DTOs.OrdenDeInspeccionDTO;
 import com.PPAI.backend.backend.boundarysExternos.InterfazEmail;
-import com.PPAI.backend.backend.boundarysExternos.Pantalla;
-import com.PPAI.backend.backend.models.CambioEstado;
-import com.PPAI.backend.backend.models.Empleado;
-import com.PPAI.backend.backend.models.EstacionSismologica;
-import com.PPAI.backend.backend.models.Estado;
-import com.PPAI.backend.backend.models.MotivoFueraServicio;
-import com.PPAI.backend.backend.models.MotivoTipo;
-import com.PPAI.backend.backend.models.OrdenDeInspeccion;
-import com.PPAI.backend.backend.models.Rol;
-import com.PPAI.backend.backend.models.Sesion;
-import com.PPAI.backend.backend.models.Sismografo;
-import com.PPAI.backend.backend.models.Usuario;
+import com.PPAI.backend.backend.config.ConexionJPA;
+import com.PPAI.backend.backend.interfaces.IObservador;
+import com.PPAI.backend.backend.interfaces.Isujeto;
+import com.PPAI.backend.backend.models.*;
+import com.PPAI.backend.backend.repositories.*;
 import gui.PantallaCierreDeOrdenDeInspeccion;
+import gui.PantallasCCRS.Pantalla;
+import jakarta.persistence.EntityManager;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,18 +22,20 @@ import java.util.List;
  */
 
 
-public class Gestor {
-    
+public class Gestor implements Isujeto {
+
+
+
     List<MotivoTipo> motivosTipo = new ArrayList<>();
     List<Sismografo> sismografos = new ArrayList<>();
     List<Empleado> empleados = new ArrayList<>();
     List<Estado> estados = new ArrayList<>();
     List<CambioEstado> cambioEstadosSismografro= new ArrayList<>();
 
-    private InterfazEmail interfazEmail = new InterfazEmail();
     private Sesion sesion;
     private Empleado empleadoLogueado; //esta
     private PantallaCierreDeOrdenDeInspeccion pantalla;
+    private List<Pantalla> pantallasCCRS1 = new ArrayList<>();
 
     //ordenesDeInspeccion
 
@@ -57,28 +51,70 @@ public class Gestor {
     private LocalDate fechaHoraActual; // esta
 
     private List<MotivoFueraServicio> motivosFueraServicio = new ArrayList<>(); //esta
-    List<String> emailEmpleadosRR = new ArrayList<>();
-    List<Pantalla> pantallas = new ArrayList<>();
+    private List<String> mailsResponsablesReparacion = new ArrayList<>();
 
-    public void publicarEnLasPantallas(){
-        System.out.println("Se actualizan las pantallas");
-        for (Pantalla p : pantallas){
-            p.actualizarPantalla();
+
+    List<IObservador> observers = new ArrayList<>();
+
+    @Override
+    public void registrarObservador(IObservador observador) {
+        observers.add(observador);
+    }
+
+    @Override
+    public void eliminarObservador(IObservador observador) {
+
+
+    }
+
+    @Override
+    public void notificar() {
+        int identificadorSismografo = sismografoSeleccionado.getIdentificadorSismografo();
+        String estadoActual = sismografoSeleccionado.getEstadoActual().getNombreEstado();
+        String mensaje = crearMensaje(identificadorSismografo, estadoActual);
+        for(IObservador observador : observers) {
+            observador.actualizar(identificadorSismografo, estadoActual,fechaHoraActual, mensaje);
         }
-
     }
 
-    public void enviarEmails(){
-        interfazEmail.enviarMail(emailEmpleadosRR);
+    public String crearMensaje(int id_sismografo, String estado) {
+        StringBuilder cuerpo = new StringBuilder();
+        cuerpo.append("El sismógrafo ").append(id_sismografo)
+                .append(" cambió a estado ").append(estado).append("\n\nMotivos:\n");
+
+        for (MotivoFueraServicio m : motivosFueraServicio) {
+            cuerpo.append(" - ").append(m.getMotivoTipo().getDescripcion()).append("\n");
+            cuerpo.append("    ").append(m.getComentario()).append("\n");
+        }
+        return cuerpo.toString();
     }
-    
+
+    public InterfazEmail crearInterfaceEmail(){
+        return new InterfazEmail(mailsResponsablesReparacion);
+    }
+
+    public void notificarPantallasyResponsables() {
+        buscarMailResponsablesReparacion();
+        InterfazEmail interfazEmail = crearInterfaceEmail();
+
+        for(Pantalla pantalla : pantallasCCRS1){
+            registrarObservador(pantalla);
+        }
+        registrarObservador(interfazEmail);
+
+        notificar();
+    }
+
+
+
     public void obtenerFechaHoraActual(){
         this.fechaHoraActual = LocalDate.now();
     }
+
     public void buscarMailResponsablesReparacion(){
         for (Empleado e : empleados){
             if(e.esResponsableDeReparacion()){
-                this.emailEmpleadosRR.add(e.getMail());
+                mailsResponsablesReparacion.add(e.getMail());
             }
         }
     }
@@ -90,7 +126,7 @@ public class Gestor {
             System.out.println("ESTAN BIEN LOS   DATOS");
         }
     }
-    
+
     public void tomarConfirmacion() {
         validarDatosCierre();
         obtenerFechaHoraActual();
@@ -98,16 +134,16 @@ public class Gestor {
         this.ordenSeleccionada.cerrar(estadoCerrada, observacionCierre);
         this.ordenSeleccionada.setFechaHoraCierre(fechaHoraActual);
         Estado estadoFueraServicio = buscarEstadoFueraDeServicio();
+        System.out.printf("ESTADO FUERA DE SERVICIO: %s\n", estadoFueraServicio);
 
         this.sismografoSeleccionado.ponerEnFueraServicio(estadoFueraServicio, motivosFueraServicio, fechaHoraActual, empleadoLogueado);
-        buscarMailResponsablesReparacion();
-        enviarEmails();
-        publicarEnLasPantallas();
+        notificarPantallasyResponsables();
     }
     
     public void ordenarOrdenesPorFechaDeFinalizacion(){
         this.ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccionDTO::getFechaHoraFinalizacion));
     }
+
     public void cerrarOrdenDeInspeccion() {
 
         buscarEmpleadoLogueado();
@@ -168,7 +204,9 @@ public class Gestor {
     
     public Estado buscarEstadoFueraDeServicio(){
         for(Estado estado: estados){
+            System.out.printf("Estados: %s\n",estado.getNombreEstado());
             if(estado.esDeAmbitoSismografo() && estado.esFueraDeServicio()){
+                System.out.printf("ENCONTRO EL ESTADO: " + estado.getNombreEstado());
                 return estado;
             }
         }
@@ -187,8 +225,9 @@ public class Gestor {
         for (OrdenDeInspeccion orden : ordenesDeInspeccion){
             if(orden.esCompletamenteRealizada() && orden.sosDeEmpleado(empleadoLogueado)){
                 //ordenesDeInspeccionFinalizadas.add(orden);
-                OrdenDeInspeccionDTO dto = orden.obtenerDatos();
+                OrdenDeInspeccionDTO dto = orden.obtenerDatos(sismografos);
                 sismografoSeleccionado = dto.getSismografo();
+                System.out.println("Sismografo seleccionado: " + sismografoSeleccionado.getNroSerie() + "Estado Actual:" + sismografoSeleccionado.getEstadoActual().getNombreEstado());
                 ordenesDeInspeccionFinalizadas.add(dto);
                 
             }
@@ -199,54 +238,78 @@ public class Gestor {
     public void buscarEmpleadoLogueado(){
         this.empleadoLogueado = sesion.obtenerEmpleado();
     }
-    
-    public Gestor(PantallaCierreDeOrdenDeInspeccion pantalla){
-        this.pantalla = pantalla;
-        
-        Rol responsableDeReparacion = new Rol("asdad", "Responsable De Reparacion");
-        
-        
-        Rol responsableDeInspeccion = new Rol("ads", "Responsable De Inspeccion");
+
+    private final SismografoRepository repoSismografo;
+    private final EmpleadoRepository repoEmpleado;
+    private final RolRepository repoRol;
+    private final MotivoTipoRepository repomotivotipo;
+    private final EstadoRepository repoestado;
+    private final  EstacionSismologicaRepository repoestacion;
+    private final  CambioEstadoRepository repocambioEstado;
+    private final  OrdenDeInspeccionRepository repocOrdenDeInspeccion;
+
+    public Gestor(){
+        //this.pantalla = pantalla;
+        // el entity manager no deberia estar aca, pero bueno funciona
+
+        Pantalla pantallaCCRS1 = new Pantalla(1);
+        Pantalla pantallaCCRS2 = new Pantalla(2);
+        Pantalla pantallaCCRS3 = new Pantalla(3);
+        pantallaCCRS1.setVisible(true);
+        pantallaCCRS2.setVisible(true);
+        pantallaCCRS3.setVisible(true);
+        pantallasCCRS1.add(pantallaCCRS1);
+        pantallasCCRS1.add(pantallaCCRS2);
+        pantallasCCRS1.add(pantallaCCRS3);
 
 
-        Pantalla pantalla1 = new Pantalla(1);
-        Pantalla pantalla2 = new Pantalla(2);
-        Pantalla pantalla3 = new Pantalla(3);
-        pantallas.add(pantalla1);
-        pantallas.add(pantalla2);
-        pantallas.add(pantalla3);
-        
-        MotivoTipo motivoTipo = new MotivoTipo("se rompio la punta del sismografo");
-        MotivoTipo motivoTipo2 = new MotivoTipo("Se quedo sin hojas");
-        MotivoTipo motivoTipo3 = new MotivoTipo("ya dejo de sismosear");
-        MotivoTipo motivoTipo4 = new MotivoTipo("me quede sin ideas");
 
-        motivosTipo.add(motivoTipo);
-        motivosTipo.add(motivoTipo2);
-        motivosTipo.add(motivoTipo3);
-        motivosTipo.add(motivoTipo4);
+        EntityManager em = ConexionJPA.getEntityManager();
+        this.repoSismografo = new SismografoRepository(em);
+        this.repoEmpleado = new EmpleadoRepository(em);
+        this.repoRol = new RolRepository(em);
+        this.repomotivotipo = new MotivoTipoRepository(em);
+        this.repoestado = new EstadoRepository(em);
+        this.repoestacion = new EstacionSismologicaRepository(em);
+        this.repocambioEstado = new CambioEstadoRepository(em);
+        this.repocOrdenDeInspeccion = new OrdenDeInspeccionRepository(em);
 
-        
-        // ACA PONEMOS LOS DATOS ESTATICOS PARA NO HACER UN DB y hacer mas lio,
-        // ademas no se si se modelan las nuevas clases que necesita el framework
+        // creo los objetos para luego perisistirlos. ¿Como voy a hacer con los cambios de estado, con esas tablas intermedias?
+        Rol inspector = new Rol("Responsable de la inspeccion de sismografos", "Inspector");
+        Rol RespRep = new Rol("Responsable de la repacion de sismografos", "Responsable De Reparacion");
 
-        // voy a crear un DTO para enviarles los datos al front papu
+        repoRol.crear(inspector);
+        repoRol.crear(RespRep);
 
-      
+        MotivoTipo motivoTipo = new MotivoTipo("Averia por vibracion");
+        MotivoTipo motivoTipo2 = new MotivoTipo("Desgaste de componente");
+        MotivoTipo motivoTipo3 = new MotivoTipo("Fallo en el sistema de registro");
+        MotivoTipo motivoTipo4 = new MotivoTipo("Fallo en fuente de alimentación");
 
-        LocalDate fechaEspecifica1 = LocalDate.of(1900, 1, 1);
+        repomotivotipo.crear(motivoTipo);
+        repomotivotipo.crear(motivoTipo2);
+        repomotivotipo.crear(motivoTipo3);
+        repomotivotipo.crear(motivoTipo4);
 
-        LocalDate fechaEspecifica2 = LocalDate.of(4000, 12, 1);
+        Estado enlinea = new Estado("Ambito Sismografo", "En Linea");
+        Estado fueraServico = new Estado("Ambito Sismografo", "Fuera De Servicio");
+        Estado compleatamente = new Estado("Ambito Orden", "Completamente Realizada");
+        Estado cerrada = new Estado("Ambito Orden", "Cerrada");
+        repoestado.crear(enlinea);
+        repoestado.crear(fueraServico);
+        repoestado.crear(compleatamente);
+        repoestado.crear(cerrada);
 
-        LocalDate fechaEspecifica3 = LocalDate.of(2024, 6, 1);
+        // creacion empleados
+        Empleado empleado1 = new Empleado("Lopez", "dustinferno60@gmail.com", "Diego", "1010", RespRep);
+        Empleado empleado2 = new Empleado("Gariglio", "miqueasenry@gmail.com", "Juan", "1333", RespRep);
+        //Empleado empleado5 = new Empleado("JOSEFU", "miqueasenry@gmail.com", "PEpe", "1333", RespRep);
+        Empleado empleado3 = new Empleado("Estevez", "miguelEsteve@gmail.com", "Miguel", "9243", inspector);
+        repoEmpleado.crear(empleado1);
+        repoEmpleado.crear(empleado2);
+        repoEmpleado.crear(empleado3);
+        //repoEmpleado.crear(empleado5);
 
-        LocalDate fechaEspecifica4 = LocalDate.of(2023, 9, 13);
-
-        LocalDate fechaEspecifica5 = LocalDate.of(2022, 9, 25);
-
-        LocalDate fechaEspecifica6 = LocalDate.of(1999, 9, 6);
-
-        // estaciones sismologicas
         EstacionSismologica estacionSismologica1 = new EstacionSismologica(123, null, null, 5, 3, "Cordoba", 1231);
         EstacionSismologica estacionSismologica2 = new EstacionSismologica(124, null, null, 9, 7, "Rio Tercero", 1352);
         EstacionSismologica estacionSismologica3 = new EstacionSismologica(125, null, null, 1, 1, "AlmaFuerte", 1272);
@@ -254,133 +317,85 @@ public class Gestor {
         EstacionSismologica estacionSismologica5 = new EstacionSismologica(127, null, null, 1, 8, "La Pampa", 1266);
         EstacionSismologica estacionSismologica6 = new EstacionSismologica(128, null, null, 8, 0, "La Rioja", 1222);
 
-        Sismografo sismografo1 = new Sismografo(fechaEspecifica1, 111, "PH01L98", estacionSismologica1, null, null);
+        repoestacion.crear(estacionSismologica1);
+        repoestacion.crear(estacionSismologica2);
+        repoestacion.crear(estacionSismologica3);
+        repoestacion.crear(estacionSismologica4);
+        repoestacion.crear(estacionSismologica5);
+        repoestacion.crear(estacionSismologica6);
+
+        LocalDate fechaEspecifica1 = LocalDate.of(1900, 1, 1);
+        LocalDate fechaEspecifica2 = LocalDate.of(4000, 12, 1);
+        LocalDate fechaEspecifica3 = LocalDate.of(2024, 6, 1);
+        LocalDate fechaEspecifica4 = LocalDate.of(2023, 9, 13);
+        LocalDate fechaEspecifica5 = LocalDate.of(2022, 9, 25);
+        LocalDate fechaEspecifica6 = LocalDate.of(1999, 9, 6);
+
+        Sismografo sismografo1 = new Sismografo(fechaEspecifica1, 111, "PH01L98", estacionSismologica5, null, null);
         Sismografo sismografo2 = new Sismografo(fechaEspecifica2, 222, "PH00F98", estacionSismologica2, null, null);
         Sismografo sismografo3 = new Sismografo(fechaEspecifica3, 333, "PH05P98", estacionSismologica3, null, null);
         Sismografo sismografo4 = new Sismografo(fechaEspecifica4, 444, "PH02M98", estacionSismologica4, null, null);
         Sismografo sismografo5 = new Sismografo(fechaEspecifica5, 555, "PH08W98", estacionSismologica5, null, null);
         Sismografo sismografo6 = new Sismografo(fechaEspecifica6, 666, "PH03X98", estacionSismologica6, null, null);
 
-        sismografoSeleccionado = sismografo1;
 
-        sismografos.add(sismografo1);
-        sismografos.add(sismografo2);
-        sismografos.add(sismografo3);
-        sismografos.add(sismografo4);
-        sismografos.add(sismografo5);
-        sismografos.add(sismografo6);
-
-        estacionSismologica1.setSismografos(sismografos);
-        estacionSismologica2.setSismografos(sismografos);
-        estacionSismologica3.setSismografos(sismografos);
-        estacionSismologica4.setSismografos(sismografos);
-        estacionSismologica5.setSismografos(sismografos);
-        estacionSismologica6.setSismografos(sismografos);
-
-        // creacion empleados
-        Empleado empleado1 = new Empleado("Lopez", "dieguito10@gmail.com", "Diego", "1010", responsableDeInspeccion);
-        Empleado empleado2 = new Empleado("Gariglio", "juanceto01@gmail.com", "Juan", "1333", responsableDeInspeccion);
-        Empleado empleado3 = new Empleado("Estevez", "kris12@gmail.com", "Miguel", "9243", responsableDeInspeccion);
-        
-        Empleado empleado4 = new Empleado("Puro", "purohueso@gmail.com", "Hueso", "1010", responsableDeReparacion);
-        Empleado empleado5 = new Empleado("Billy", "byllymandy@gmail.com", "Mandy", "1333", responsableDeReparacion);
-        Empleado empleado6 = new Empleado("Pepito", "perezpepito@gmail.com", "perez", "9243", responsableDeReparacion);
-   
-        empleados.add(empleado1);
-        empleados.add(empleado2);
-        empleados.add(empleado3);
-        empleados.add(empleado4);
-        empleados.add(empleado5);
-        empleados.add(empleado6);
-
-
-        // creacion estados
-
-        Estado estadoCompletamenteRealizada = new Estado("Ambito Orden", "Completamente Realizada");
-        Estado estadoPendienteDeRealizacion = new Estado("Ambito Orden","Pendiente De Realizacion");
-        Estado estadoCerrada = new Estado("Ambito Orden","Cerrada");
-        
-        Estado estadoFueraServicio = new Estado("Ambito Sismografo", "Fuera De Servicio");
-        Estado estadoEnLinea = new Estado("Ambito Sismografo", "En Linea");
-        Estado estadoFueraDeLinea = new Estado("Ambito Sismografo", "Fuera De Linea");
-
-
-
-        //  cerrada
-
-
-        OrdenDeInspeccion ordenDeInspeccion = new OrdenDeInspeccion(null, fechaEspecifica1, null, 123, "");
-        ordenDeInspeccion.setEmpleado(empleado1);
-        ordenDeInspeccion.setEstado(estadoPendienteDeRealizacion);
-        ordenDeInspeccion.setEstacionSismologica(estacionSismologica5);
-
-        OrdenDeInspeccion ordenDeInspeccion2 = new OrdenDeInspeccion(null, fechaEspecifica2, null, 456, "");
-        ordenDeInspeccion2.setEmpleado(empleado1);
-        ordenDeInspeccion2.setEstado(estadoPendienteDeRealizacion);
-        ordenDeInspeccion2.setEstacionSismologica(estacionSismologica2);
-
-        OrdenDeInspeccion ordenDeInspeccion3 = new OrdenDeInspeccion(null, fechaEspecifica3, null, 789, "");
-        ordenDeInspeccion3.setEmpleado(empleado2);
-        ordenDeInspeccion3.setEstado(estadoCompletamenteRealizada);
-        ordenDeInspeccion3.setEstacionSismologica(estacionSismologica4);
-
-        OrdenDeInspeccion ordenDeInspeccion4 = new OrdenDeInspeccion(null, fechaEspecifica4, null, 101, "");
-        ordenDeInspeccion4.setEmpleado(empleado2);
-        ordenDeInspeccion4.setEstado(estadoCompletamenteRealizada);
-        ordenDeInspeccion4.setEstacionSismologica(estacionSismologica3);
-
-        OrdenDeInspeccion ordenDeInspeccion5 = new OrdenDeInspeccion(null, fechaEspecifica5, null, 121, "");
-        ordenDeInspeccion5.setEmpleado(empleado3);
-        ordenDeInspeccion5.setEstado(estadoCompletamenteRealizada);
-        ordenDeInspeccion5.setEstacionSismologica(estacionSismologica1);
-
-        OrdenDeInspeccion ordenDeInspeccion6 = new OrdenDeInspeccion(null, fechaEspecifica6, null, 141, "");
-        ordenDeInspeccion6.setEmpleado(empleado3);
-        ordenDeInspeccion6.setEstado(estadoCompletamenteRealizada);
-        ordenDeInspeccion6.setEstacionSismologica(estacionSismologica6);
-
-        ordenesDeInspeccion.add(ordenDeInspeccion);
-        ordenesDeInspeccion.add(ordenDeInspeccion2);
-        ordenesDeInspeccion.add(ordenDeInspeccion3);
-        ordenesDeInspeccion.add(ordenDeInspeccion4);
-        ordenesDeInspeccion.add(ordenDeInspeccion5);
-        ordenesDeInspeccion.add(ordenDeInspeccion6);
-
-        // creacion de usuario y sesion
-        Usuario usuario1 = new Usuario("juanceto01", "1234", empleado1);
-        Sesion sesion1 = new Sesion(usuario1);
-
-        Usuario usuario2 = new Usuario("kris12", "9934", empleado2);
-        Sesion sesion2 = new Sesion(usuario2);
-
-        Usuario usuario3 = new Usuario("DiegoyoloARG", "1299", empleado3);
-        Sesion sesion3 = new Sesion(usuario3);
-
-        this.sesion = sesion3; // aca podemos elegir la sesion, LA SESION 1 NO TIENE ORDENES COMPLETADAS
-        // (me olvide q se lo habia puesto asi y estuve renegando como mono porque no sabia q re poronga era q me enviava un array vacio)
-
-        //buscarEmpleadoLogueado();
-        //buscarInspeccionesCompletamenteFinalizadas(); // ojo con sacar esta linea porque esta ejecuta el metodo que busca el sismografo xd -> hay que ver como podemos hacer para obtener el sismografo si utilizar este metodo
-        //ordenesDeInspeccionFinalizadas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaHoraFinalizacion));
-
-        // aca es medio un lio porque necesitaba que el sismografro tuviese cambio de estados.
-        sismografoSeleccionado.setEstadoActual(estadoFueraDeLinea);
-        CambioEstado  cambioEstado1 = new CambioEstado(fechaEspecifica1, estadoEnLinea, null);
+        CambioEstado  cambioEstado1 = new CambioEstado(fechaEspecifica1, fueraServico, null);
         cambioEstado1.setFechaHoraFin(LocalDate.now());
 
-        CambioEstado cambioEstado2 = new CambioEstado(fechaEspecifica2, estadoFueraDeLinea, null);
+        CambioEstado cambioEstado2 = new CambioEstado(fechaEspecifica2, enlinea, null);
         cambioEstadosSismografro.add(cambioEstado1);
         cambioEstadosSismografro.add(cambioEstado2);// este tiene fecha fin null
         cambioEstado2.setFechaHoraFin(null);
-        sismografoSeleccionado.setCambioEstados(cambioEstadosSismografro);
-        sismografo6.setCambioEstados(cambioEstadosSismografro);
+
         sismografo1.setCambioEstados(cambioEstadosSismografro);
 
-        estados.add(estadoCompletamenteRealizada);
-        estados.add(estadoPendienteDeRealizacion);
-        estados.add(estadoCerrada);
-        estados.add(estadoFueraServicio);
-        estados.add(estadoEnLinea);
+        repoSismografo.crear(sismografo1);
+
+        cambioEstado1.setSismografo(sismografo1);
+        cambioEstado2.setSismografo(sismografo1);
+        sismografo1.setEstadoActual(enlinea);
+        repocambioEstado.crear(cambioEstado1);
+        repocambioEstado.crear(cambioEstado2);
+
+        this.sismografos = repoSismografo.obtenerTodos();
+
+        repoEmpleado.obtenerPorMail("miqueasenry@gmail.com");
+        Usuario usuario1 = new Usuario("juanceto01", "1234", empleado1);
+        Sesion sesion1 = new Sesion(usuario1);
+        this.sesion = sesion1;
+
+
+        //repoSismografo.crear(sismografo2);
+        //repoSismografo.crear(sismografo3);
+        //repoSismografo.crear(sismografo4);
+
+        OrdenDeInspeccion ordenDeInspeccion = new OrdenDeInspeccion(null, fechaEspecifica1, null, 123, "");
+        ordenDeInspeccion.setEmpleado(empleado1);
+        ordenDeInspeccion.setEstado(compleatamente);
+        ordenDeInspeccion.setEstacionSismologica(estacionSismologica5);
+
+        repocOrdenDeInspeccion.crear(ordenDeInspeccion);
+
+        this.ordenesDeInspeccion = repocOrdenDeInspeccion.obtenerTodos();
+
+        for(Sismografo s: sismografos){
+            System.out.println(s.getNroSerie());
+            System.out.println(s.getEstadoActual().getNombreEstado());
+        }
+
+        motivosTipo = repomotivotipo.obtenerTodos();
+        estados = repoestado.obtenerTodos();
+        empleados = repoEmpleado.obtenerTodos();
+
+
+
+
+
+
     }
 
+
+    public void setPantalla(PantallaCierreDeOrdenDeInspeccion pantallaCierreDeOrdenDeInspeccion) {
+        this.pantalla = pantallaCierreDeOrdenDeInspeccion;
+    }
 }

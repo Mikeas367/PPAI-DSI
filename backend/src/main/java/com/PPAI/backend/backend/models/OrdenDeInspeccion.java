@@ -1,11 +1,16 @@
 package com.PPAI.backend.backend.models;
 
 import com.PPAI.backend.backend.DTOs.OrdenDeInspeccionDTO;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Entity
 public class OrdenDeInspeccion {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private LocalDate  fechaHoraCierre;
     private LocalDate  fechaHoraFinalizacion;
     private LocalDate fechaHoraInicio;
@@ -13,9 +18,18 @@ public class OrdenDeInspeccion {
     private String observacionCierre;
 
     // atributos referenciales
+    @OneToOne
     private Estado estado;
+    @OneToOne
     private EstacionSismologica estacionSismologica;
+    @OneToOne
     private Empleado empleado;
+
+
+
+    public OrdenDeInspeccion() {
+
+    }
 
 
     // metodos de la solucion
@@ -30,8 +44,8 @@ public class OrdenDeInspeccion {
     public String  mostrarEstacionSismologica(){
         return this.estacionSismologica.getNombre();
     }
-    public OrdenDeInspeccionDTO obtenerDatos() {
-        Sismografo sis = estacionSismologica.buscarSismografo();
+    public OrdenDeInspeccionDTO obtenerDatos(List<Sismografo> sismografos) {
+        Sismografo sis = estacionSismologica.buscarSismografo(sismografos);
         OrdenDeInspeccionDTO datos = new OrdenDeInspeccionDTO(
                 this.numeroOrden,
                 this.fechaHoraFinalizacion,

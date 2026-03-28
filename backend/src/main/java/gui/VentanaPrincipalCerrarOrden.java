@@ -47,10 +47,5 @@ public class VentanaPrincipalCerrarOrden extends JFrame {
         this.requestFocus();
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            VentanaPrincipalCerrarOrden ventana = new VentanaPrincipalCerrarOrden();
-            ventana.setVisible(true);
-        });
-    }
+
 }

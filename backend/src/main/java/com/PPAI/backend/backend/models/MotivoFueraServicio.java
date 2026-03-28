@@ -1,10 +1,21 @@
 package com.PPAI.backend.backend.models;
 
-public class MotivoFueraServicio {
+import jakarta.persistence.*;
 
+@Entity
+public class MotivoFueraServicio {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String comentario;
 
+    @ManyToOne
+    @JoinColumn(name = "motivoTipo_id")
     private MotivoTipo motivoTipo;
+
+    @ManyToOne
+    @JoinColumn(name = "cambio_estado_id")
+    private CambioEstado cambioEstado;
 
     public MotivoFueraServicio(String comentario, MotivoTipo motivoTipo) {
         this.comentario = comentario;

@@ -19,13 +19,15 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
 
     public PantallaCierreDeOrdenDeInspeccion(VentanaPrincipalCerrarOrden ventanaPrincipal) {
         this.ventanaPrincipal = ventanaPrincipal;
-        this.gestor = new Gestor(this);
+        this.gestor = new Gestor();
+        this.gestor.setPantalla(this);
         initComponents();
 
         jTable1.setVisible(false);
         jTextArea1.setVisible(false);
         jComboBox1.setVisible(false);
         jTextArea2.setVisible(false);
+        gestor.cerrarOrdenDeInspeccion();
 
         this.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -62,9 +64,9 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
         panelOrden.setBackground(fondo);
         panelOrden.setBorder(BorderFactory.createTitledBorder("1. Selección de Orden"));
 
-        jButton2 = crearBoton("Cargar órdenes finalizadas", naranja);
-        jButton2.addActionListener(this::jButton2ActionPerformed);
-        panelOrden.add(jButton2, BorderLayout.NORTH);
+        //jButton2 = crearBoton("Cargar órdenes finalizadas", naranja);
+        //jButton2.addActionListener(this::jButton2ActionPerformed);
+        //panelOrden.add(jButton2, BorderLayout.NORTH);
 
         jTable1 = new JTable(new DefaultTableModel(
                 new Object[][]{},
@@ -246,7 +248,7 @@ public class PantallaCierreDeOrdenDeInspeccion extends JFrame {
         
     }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
-        gestor.cerrarOrdenDeInspeccion();
+        //gestor.cerrarOrdenDeInspeccion();
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {

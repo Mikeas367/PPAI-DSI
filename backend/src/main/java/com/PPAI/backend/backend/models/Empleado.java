@@ -1,11 +1,20 @@
 package com.PPAI.backend.backend.models;
 import com.PPAI.backend.backend.models.Rol;
+import jakarta.persistence.*;
+
+@Entity
 public class Empleado {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String apellido;
     private String mail;
     private String nombre;
     private String telefono;
-    
+
+
+    @ManyToOne
+    @JoinColumn(name = "rol_id")
     private Rol rol;
 
     public Empleado() {

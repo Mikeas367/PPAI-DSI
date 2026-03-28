@@ -4,43 +4,50 @@
  */
 package com.PPAI.backend.backend.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 /**
  *
  * @author Miqueas
  */
+@Entity
 public class Rol {
-   private String descripcionRol;
-   private String nombre;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String descripcionRol;
+    private String nombre;
    
-   public boolean sosResponsableReparacion(){
-       if(this.nombre == "Responsable De Reparacion"){
-           return true;
+    public boolean sosResponsableReparacion(){
+        if(this.nombre == "Responsable De Reparacion"){
+            return true;
+        }
+            return false;
        }
-       return false;
-   }
-    public Rol() {
-    }
+
+       public Rol() {}
 
     public Rol(String descripcionRol, String nombre) {
-        this.descripcionRol = descripcionRol;
-        this.nombre = nombre;
-    }
-   
-    public String getDescripcionRol() {
-        return descripcionRol;
+            this.descripcionRol = descripcionRol;
+            this.nombre = nombre;
     }
 
-    public void setDescripcionRol(String descripcionRol) {
-        this.descripcionRol = descripcionRol;
-    }
+        public String getDescripcionRol() {
+            return descripcionRol;
+        }
 
-    public String getNombre() {
-        return nombre;
-    }
+        public void setDescripcionRol(String descripcionRol) {
+            this.descripcionRol = descripcionRol;
+        }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-   
-   
+        public String getNombre() {
+            return nombre;
+        }
+
+        public void setNombre(String nombre) {
+            this.nombre = nombre;
+        }
 }

@@ -1,9 +1,18 @@
 package com.PPAI.backend.backend.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import java.util.Date;
 import java.util.List;
-
+@Entity
 public class EstacionSismologica {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     private int codigoEstacion;
     private String documentoCertificacionAdq;
     private Date fechaSolicitudCertificacion;
@@ -12,22 +21,22 @@ public class EstacionSismologica {
     private String nombre;
     private int nroCertificacionAdquisicion;
 
-    List<Sismografo> sismografos; //estos sismografos
+    //List<Sismografo> sismografos; //estos sismografos
     // SON TEMPORALES SOLO LO USO PARA RECORRER PARA ENCONTRAR EL SIS QUE LE PERTENECE A ESTA ES
 
-    public void setSismografos(List<Sismografo> sismografos) {
-        this.sismografos = sismografos;
-    }
+    //public void setSismografos(List<Sismografo> sismografos) {
+        //this.sismografos = sismografos;
+    //}
 
     // metodos de solucion
 
 
-    public Sismografo buscarSismografo(){
+    public Sismografo buscarSismografo(List<Sismografo> sismografos) {
         // en vez de tener una lista lo mejor seria tener un BD y llamar al repo directamente aca para
         // obtener todos los simografos, pero como no tenemos db voy a crear una lista
-        for(Sismografo sismografo : sismografos){
-            if (sismografo.sosDeEstacionSismologica(this)){
-                return sismografo;
+        for(Sismografo s : sismografos){
+            if (s.sosDeEstacionSismologica(this)){
+                return s;
             }
         }
         return null;

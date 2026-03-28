@@ -1,15 +1,35 @@
 package com.PPAI.backend.backend.models;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
+@Entity
 public class CambioEstado {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private LocalDate fechaHoraFin;
     private LocalDate fechaHoraInicio;
 
+    @ManyToOne
+    @JoinColumn(name = "estado_id")
     private Estado estado;
+    @OneToMany(mappedBy = "cambioEstado", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<MotivoFueraServicio> motivosFueraServicio;
+
+    @ManyToOne
+    @JoinColumn(name = "responsbleDeInspeccion_id")
     private Empleado responsableDeInspeccion;
+
+    @ManyToOne
+    @JoinColumn(name = "sismografo_id")
+    private Sismografo sismografo;
+
+    public CambioEstado() {
+
+    }
 
     public void mostrarMotivos(){
         for (MotivoFueraServicio m : motivosFueraServicio){
@@ -59,5 +79,9 @@ public class CambioEstado {
 
     public void setEstado(Estado estado) {
         this.estado = estado;
+    }
+
+    public void  setSismografo(Sismografo sismografo) {
+        this.sismografo = sismografo;
     }
 }

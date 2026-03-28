@@ -1,16 +1,33 @@
 package com.PPAI.backend.backend.models;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
+@Entity
 public class Sismografo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private LocalDate fechaAdquisision;
     private int identificadorSismografo; // id normal
     private String nroSerie; // seria como los digitos del codigo de barras que puede tener letras
 
+    @ManyToOne
+    @JoinColumn(name = "estacionSismologica_id")
     private EstacionSismologica estacionSismologica;
+
+    @ManyToOne
+    @JoinColumn(name = "estadoActual_id")
     private Estado estadoActual;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CambioEstado> cambioEstados;
+
+    public Sismografo() {
+
+    }
 
     public void crearNuevoCambioEstado(LocalDate fechaHoraInicio, List<MotivoFueraServicio> motivoFueraServicio, Estado estado, Empleado responsable) {
         System.out.println("------------>creando cambio estado en el Sismografo");
