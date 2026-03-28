@@ -1,0 +1,53 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.PPAI.backend.backend.models;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+/**
+ *
+ * @author Miqueas
+ */
+@Entity
+public class Rol {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String descripcionRol;
+    private String nombre;
+   
+    public boolean sosResponsableReparacion(){
+        if(this.nombre == "Responsable De Reparacion"){
+            return true;
+        }
+            return false;
+       }
+
+       public Rol() {}
+
+    public Rol(String descripcionRol, String nombre) {
+            this.descripcionRol = descripcionRol;
+            this.nombre = nombre;
+    }
+
+        public String getDescripcionRol() {
+            return descripcionRol;
+        }
+
+        public void setDescripcionRol(String descripcionRol) {
+            this.descripcionRol = descripcionRol;
+        }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public void setNombre(String nombre) {
+            this.nombre = nombre;
+        }
+}
